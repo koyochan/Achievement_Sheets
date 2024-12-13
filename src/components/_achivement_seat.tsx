@@ -76,7 +76,7 @@ const AchievementSheet = () => {
           <CardTitle className="text-2xl text-blue-600">評価セクション</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="w-full max-w-lg mx-auto">
+          <div className="w-full max-w-3xl mx-auto">
             <ChartContainer
               config={{
                 ratings: {
@@ -84,7 +84,7 @@ const AchievementSheet = () => {
                   color: "hsl(var(--chart-1))",
                 },
               }}
-              className="aspect-square"
+              className="aspect-video"
             >
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={data.ratings}>
