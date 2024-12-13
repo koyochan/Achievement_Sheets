@@ -8,6 +8,10 @@
     "esModuleInterop": true,
     "strict": true,
     "moduleResolution": "Node",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "baseUrl": ".", // プロジェクトのルートを基準にする
+    "paths": {
+      "@/*": ["./src/*"] // "@" を "src" ディレクトリにマッピング
+    }
   }
 }
