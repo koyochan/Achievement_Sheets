@@ -8,8 +8,26 @@ import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Calendar, User, Activity, Target, Upload, Star } from 'lucide-react'
 
-const AchievementSheet = () => {
-  const data = {
+interface Rating {
+  skill: string;
+  value: number;
+}
+
+interface AchievementData {
+  student_name: string;
+  date: string;
+  teacher: string;
+  activity: string;
+  goal: string;
+  progress: string;
+  progress_percentage: number;
+  ratings: Rating[];
+  xp_earned: number;
+  teacher_comment: string;
+}
+
+const AchievementSheet: React.FC = () => {
+  const data: AchievementData = {
     student_name: "山田 太郎",
     date: "2024-12-12",
     teacher: "佐藤 先生",
@@ -26,7 +44,7 @@ const AchievementSheet = () => {
     ],
     xp_earned: 21,
     teacher_comment: "集中して頑張りました。次回はスコア機能に挑戦しましょう。",
-  }
+  };
 
   return (
     <div className="container mx-auto p-6 space-y-8">
@@ -149,8 +167,7 @@ const AchievementSheet = () => {
         </CardContent>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default AchievementSheet
-
+export default AchievementSheet;
