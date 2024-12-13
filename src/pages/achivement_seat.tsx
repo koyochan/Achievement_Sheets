@@ -1,8 +1,8 @@
 'use client'
 
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { RadarChart, PolarAngleAxis, PolarGrid, Radar } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../components/ui/chart"
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 
 const AchievementSheet = () => {
   const data = {
@@ -77,8 +77,45 @@ const AchievementSheet = () => {
           </div>
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>今日の成果物</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-gray-100 h-48 flex items-center justify-center rounded-lg border border-dashed border-gray-300">
+            <p className="text-gray-500">（写真がここに表示されます）</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>振り返り</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-700">{data.teacher_comment}</p>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>目標と進捗</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-lg">
+            <strong className="text-gray-600">目標:</strong> {data.goal}
+          </p>
+          <p className="text-lg">
+            <strong className="text-gray-600">進捗:</strong> {data.progress}
+          </p>
+          <p className="text-lg mt-4">
+            <strong className="text-gray-600">獲得XP:</strong> {data.xp_earned} XP
+          </p>
+        </CardContent>
+      </Card>
     </div>
   )
 }
 
-export default AchievementSheet;
+export default AchievementSheet
