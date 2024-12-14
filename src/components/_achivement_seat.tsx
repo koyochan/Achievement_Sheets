@@ -1,6 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadarChart, PolarAngleAxis, PolarGrid, Radar, ResponsiveContainer } from "recharts";
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { Calendar, User, Activity, Target, Upload, Star } from "lucide-react";
@@ -24,20 +23,23 @@ interface AchievementData {
   teacher_comment: string;
 }
 
-// コンポーネントのProps型定義
+// データ型に基づくProps定義
 interface AchievementSheetProps {
-  data: AchievementData; // Astroから渡されるデータ
+  data: AchievementData;
 }
 
+// AchievementSheet コンポーネント
 const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
-  if (!data) return <div>Loading...</div>; // データがない場合のフォールバック
+  if (!data) return <div>データが見つかりません。</div>; // データがない場合のフォールバック
 
   return (
     <div className="container mx-auto p-6 space-y-8">
+      {/* タイトル */}
       <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-8 rounded-lg shadow-lg">
         <h1 className="text-4xl font-bold text-center">アチーブメントシート</h1>
       </div>
 
+      {/* 基本情報セクション */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* 生徒情報 */}
         <Card className="shadow-md">
@@ -94,13 +96,56 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
         </CardContent>
       </Card>
 
-      {/* その他のセクション */}
+      {/* 今日の成果物セクション */}
+      <Card className="shadow-md">
+        <CardHeader>
+          <CardTitle className="text-2xl text-blue-600">今日の成果物</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="bg-gray-100 h-48 flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300">
+            <p className="text-gray-500 mb-4">（写真がここに表示されます）</p>
+            <Button variant="outline">
+              <Upload className="mr-2 h-4 w-4" /> 写真をアップロード
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 振り返りセクション */}
       <Card className="shadow-md">
         <CardHeader>
           <CardTitle className="text-2xl text-blue-600">振り返り</CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-gray-700 text-lg italic">&ldquo;{data.teacher_comment}&rdquo;</p>
+        </CardContent>
+      </Card>
+
+      {/* 目標と進捗セクション */}
+      <Card className="shadow-md">
+        <CardHeader>
+          <CardTitle className="text-2xl text-blue-600">目標と進捗</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-start space-x-2">
+              <Target className="text-blue-500 mt-1 flex-shrink-0" />
+              <div>
+                <p className="text-lg font-semibold text-gray-700">目標:</p>
+                <p className="text-gray-600">{data.goal}</p>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <p className="text-lg font-semibold text-gray-700">進捗:</p>
+              <p className="text-gray-600 mb-2">{data.progress}</p>
+              <Progress value={data.progress_percentage} className="w-full" />
+              <p className="text-right text-sm text-gray-500">{data.progress_percentage}% 完了</p>
+            </div>
+          </div>
+          <div className="mt-6 flex items-center justify-center space-x-2 bg-yellow-100 p-4 rounded-lg">
+            <Star className="text-yellow-500" />
+            <p className="text-xl font-bold text-yellow-700">獲得XP: {data.xp_earned} XP</p>
+          </div>
         </CardContent>
       </Card>
     </div>
