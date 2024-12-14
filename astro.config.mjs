@@ -7,6 +7,6 @@ export default defineConfig({
     tailwind({
       applyBaseStyles: false, // Baseスタイルの二重適用を防ぐ
     }),
-    react(), // React インテグレーションを追加
+    react(), // Reactのインテグレーションを追加
   ],
 });
