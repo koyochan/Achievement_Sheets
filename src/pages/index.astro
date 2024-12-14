@@ -1,26 +1,8 @@
 ---
-import "@/styles/globals.css";
-import AchievementSheet, { AchievementData } from "@/components/_AchivementSeat"; // AchievementData をインポート
-import AchievementForm from "@/components/_AchievementForm";
+import AchievementManagementPage from "@/pages/_AchievementManagementPage";
 import Layout from "@/layouts/Layout.astro";
-
-let submittedData = null;
-
-const handleFormSubmit = (data: AchievementData) => {
-  submittedData = data;
-};
 ---
 
 <Layout title="Achievement Management" description="Manage student achievements">
-  <!-- フォームの表示 -->
-  <div class="p-6">
-    <AchievementForm client:load onSubmit={(data) => handleFormSubmit(data)} initialData={{}} />
-  </div>
-
-  <!-- AchievementSheetの表示 -->
-  {submittedData && (
-    <div class="mt-8">
-      <AchievementSheet client:visible data={submittedData} />
-    </div>
-  )}
+  <AchievementManagementPage client:load />
 </Layout>
