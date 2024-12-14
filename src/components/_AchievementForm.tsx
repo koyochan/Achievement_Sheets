@@ -1,21 +1,53 @@
 import React, { useState } from "react";
+import { AchievementData } from "./_AchivementSeat";
 
 interface AchievementFormProps {
-  onSubmit: (formData: Record<string, any>) => void;
-  initialData?: Record<string, any>;
+  onSubmit: (formData: AchievementData) => void;
+  initialData?: Partial<AchievementData>;
 }
 
 const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData }) => {
-  const [formData, setFormData] = useState(initialData || {});
+  const [formData, setFormData] = useState<Partial<AchievementData>>({
+    student_name: "",
+    activity: "",
+    teacher_comment: "",
+    date: "",
+    teacher: "",
+    goal: "",
+    progress: "",
+    progress_percentage: 0,
+    ratings: [],
+    xp_earned: 0,
+    ...initialData,
+  });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    onSubmit(formData);
+
+    if (!formData.student_name || !formData.activity || !formData.teacher_comment) {
+      console.error("必須フィールドが入力されていません。");
+      return;
+    }
+
+    const completedData: AchievementData = {
+      student_name: formData.student_name || "",
+      activity: formData.activity || "",
+      teacher_comment: formData.teacher_comment || "",
+      date: formData.date || new Date().toISOString().split("T")[0],
+      teacher: formData.teacher || "未設定",
+      goal: formData.goal || "未設定",
+      progress: formData.progress || "未設定",
+      progress_percentage: formData.progress_percentage || 0,
+      ratings: formData.ratings || [],
+      xp_earned: formData.xp_earned || 0,
+    };
+
+    onSubmit(completedData);
   };
 
   return (
