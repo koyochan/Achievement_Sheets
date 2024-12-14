@@ -10,7 +10,7 @@ interface Rating {
   value: number;
 }
 
-interface AchievementData {
+export interface AchievementData {
   student_name: string;
   date: string;
   teacher: string;
