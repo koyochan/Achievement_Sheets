@@ -1,5 +1,27 @@
 ---
-import "../styles/globals.css"; // Tailwind CSSを読み込む
+import "@/styles/globals.css";
+// Define your Props interface with both `title` and `description`
+interface Props {
+  title: string;
+  description: string;
+}
+
+// Extract props from Astro.props
+const { title, description } = Astro.props as Props;
 ---
 
-<h1 class="text-blue-500">Tailwindが適用されています！</h1>
+<html lang="jp" transition:animate="none">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <!-- Add the meta description tag below -->
+    <meta name="description" content={description} />
+    <!-- Enable SPA mode -->
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
