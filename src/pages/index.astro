@@ -1,13 +1,26 @@
 ---
 import "@/styles/globals.css";
-import AchievementSheet from "@/components/_achivement_seat";
+import AchievementSheet from "@/components/_AchivementSeat";
+import AchievementForm from "@/components/_AchievementForm";
 import Layout from "@/layouts/Layout.astro";
 
-const response = await fetch("http://localhost:4321/api/achievement.json");
-const data = await response.json();
-console.log("Fetched Data:", data);
+let submittedData = null;
+
+const handleFormSubmit = (data: AchievementData) => {
+  submittedData = data;
+};
 ---
 
-<Layout title="Achievement Sheet" description="View the student's achievements">
-  <AchievementSheet client:load data={data} />
+<Layout title="Achievement Management" description="Manage student achievements">
+  <!-- フォームの表示 -->
+  <div class="p-6">
+    <AchievementForm client:load onSubmit={(data) => handleFormSubmit(data)} initialData={{}} />
+  </div>
+
+  <!-- AchievementSheetの表示 -->
+  {submittedData && (
+    <div class="mt-8">
+      <AchievementSheet client:visible data={submittedData} />
+    </div>
+  )}
 </Layout>
