@@ -74,6 +74,25 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
         </Card>
       </div>
 
+      {/* 評価セクション */}
+      <Card className="shadow-md">
+        <CardHeader>
+          <CardTitle className="text-2xl text-blue-600">評価セクション</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="w-full max-w-3xl mx-auto">
+            <ResponsiveContainer width="100%" height={400}>
+              <RadarChart data={data.ratings}>
+                <PolarGrid stroke="#e2e8f0" />
+                <PolarAngleAxis dataKey="skill" tick={{ fill: "#4a5568" }} />
+                <Radar dataKey="value" fill="#4A90E2" fillOpacity={0.6} />
+                <ChartTooltip content={<ChartTooltipContent />} />
+              </RadarChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card className="shadow-md">
         <CardHeader>
           <CardTitle className="text-2xl text-blue-600">振り返り</CardTitle>

@@ -1,11 +1,13 @@
 ---
 import "@/styles/globals.css";
 import AchievementSheet from "@/components/_achivement_seat";
-import "@/layouts/Layout.astro"
+import Layout from "@/layouts/Layout.astro";
 
 const response = await fetch("http://localhost:4321/api/achievement.json");
 const data = await response.json();
-console.log("Fetched Data:", data); // 取得データを確認
+console.log("Fetched Data:", data);
 ---
 
-<AchievementSheet client:load data={data} />
+<Layout title="Achievement Sheet" description="View the student's achievements">
+  <AchievementSheet client:load data={data} />
+</Layout>
