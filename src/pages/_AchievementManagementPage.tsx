@@ -8,30 +8,21 @@ const AchievementManagementPage: React.FC = () => {
   // フォーム送信ハンドラー
   const handleFormSubmit = (data: AchievementData) => {
     console.log("フォーム送信データ:", data);
-    setSubmittedData(data);
+    setSubmittedData(data); // フォーム送信後にデータを保存
   };
 
   return (
-    <>
-      {/* フォーム部分 */}
-      <div className="p-6">
+    <div className="p-6">
+      {/* AchievementForm の表示制御 */}
+      {!submittedData ? (
         <AchievementForm 
           onSubmit={handleFormSubmit} 
           initialData={{}} 
         />
-      </div>
-
-      {/* AchievementSheetを動的に表示 */}
-      {submittedData ? (
-        <div className="mt-8">
-          <AchievementSheet 
-            data={submittedData} 
-          />
-        </div>
       ) : (
-        <div className="mt-8 text-center text-gray-600">まだデータが入力されていません。</div>
+        <AchievementSheet data={submittedData} />
       )}
-    </>
+    </div>
   );
 };
 
