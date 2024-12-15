@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { AchievementData } from "./_AchivementSeat"
+import { AchievementData } from "./AchievementSheet"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"

@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import AchievementSheet, { AchievementData } from "@/components/AchivementSeat";
+import AchievementSheet, { AchievementData } from "@/components/AchievementSheet";
 import AchievementForm from "@/components/AchievementForm";
 import { saveAchievementToFirestore } from "@/utils/firestore"; // Firestore 操作用関数をインポート
+import { calculateXp } from "@/utils/CalculateXp"; // XP 計算用関数をインポート
 
 const AchievementManagementPage: React.FC = () => {
   const [submittedData, setSubmittedData] = useState<AchievementData | null>(null);
@@ -17,10 +18,17 @@ const AchievementManagementPage: React.FC = () => {
       setIsSaving(true); // 保存中の状態を設定
       setErrorMessage(null); // エラーリセット
 
-      // Firestore にデータを送信
-      await saveAchievementToFirestore(userId, data);
+      // XP を計算
+      const xpEarned = calculateXp(data.progress_percentage, data.ratings);
+      const dataWithXp = {
+        ...data,
+        xp_earned: xpEarned, // 計算結果を追加
+      };
 
-      setSubmittedData(data); // 保存が成功したら画面を切り替える
+      // Firestore にデータを送信
+      await saveAchievementToFirestore(userId, dataWithXp);
+
+      setSubmittedData(dataWithXp); // 保存が成功したら画面を切り替える
     } catch (error) {
       setErrorMessage("データ保存中にエラーが発生しました。");
     } finally {
