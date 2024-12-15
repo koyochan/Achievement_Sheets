@@ -8,6 +8,7 @@ import {
   PolarRadiusAxis,
 } from "recharts";
 import { motion } from "framer-motion";
+import { calculateXp } from "@/utils/CalculateXp"; 
 
 interface Rating {
   skill: string;
@@ -33,6 +34,9 @@ interface AchievementSheetProps {
 
 const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
   if (!data) return <div className="text-black">データが見つかりません。</div>;
+
+  // calculateXp を使用して獲得XPを計算
+  const calculatedXp = calculateXp(data.progress_percentage, data.ratings);
 
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
@@ -170,7 +174,9 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
             <CardTitle className="text-2xl text-black">獲得XP</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-700 text-lg">このセッションで獲得したXP: <strong>{data.xp_earned} XP</strong></p>
+            <p className="text-gray-700 text-lg">
+              <strong>{calculatedXp} XP</strong>
+            </p>
           </CardContent>
         </Card>
       </motion.div>
