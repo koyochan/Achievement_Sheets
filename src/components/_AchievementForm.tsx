@@ -87,6 +87,17 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
                 required
               />
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+                <Label htmlFor="teacher">担当教師</Label>
+                <Input
+                id="teacher"
+                name="teacher"
+                value={formData.teacher || ""}
+                onChange={handleChange}
+                />
+            </div>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="date">日付</Label>
               <DatePicker
@@ -118,6 +129,15 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
               onChange={handleChange}
             />
           </div>
+           <div className="space-y-2">
+            <Label htmlFor="progress">進捗状況</Label>
+            <Input
+            id="progress"
+            name="progress"
+            value={formData.progress || ""}
+            onChange={handleChange}
+            />
+            </div>
 
           <div className="space-y-2">
             <Label htmlFor="progress_percentage">進捗率</Label>

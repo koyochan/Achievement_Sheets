@@ -22,7 +22,7 @@ export const ProgressInput: React.FC<ProgressInputProps> = ({ id, name, value, o
         className="slider w-full" // カスタムクラス名を指定
       />
       <div className="text-sm text-gray-500 text-right">{value}%</div>
-      <style jsx>{`
+      <style>{`
         .slider {
           --slider-track-bg: #d1d5db; /* トラックの背景色 (gray-300) */
           --slider-progress-bg: #6b7280; /* プログレスバーの色 (gray-500) */
