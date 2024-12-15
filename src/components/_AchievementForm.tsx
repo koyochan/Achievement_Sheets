@@ -1,9 +1,17 @@
-import React, { useState } from "react";
-import { AchievementData } from "./_AchivementSeat";
+import React, { useState } from "react"
+import { AchievementData } from "./_AchivementSeat"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
+import { StarRating } from "./_StartRating"
+import { ProgressInput } from "./_ProgressInput"
+import { DatePicker } from "./_DataPicker"
 
 interface AchievementFormProps {
-  onSubmit: (formData: AchievementData) => void;
-  initialData?: Partial<AchievementData>;
+  onSubmit: (formData: AchievementData) => void
+  initialData?: Partial<AchievementData>
 }
 
 const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData }) => {
@@ -22,28 +30,27 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
       { skill: "コミュニケーション能力", value: 3 },
       { skill: "問題解決能力", value: 3 },
     ],
-    xp_earned: 0,
     teacher_comment: "",
     ...initialData,
-  });
+  })
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
-  };
+    const { name, value } = event.target
+    setFormData({ ...formData, [name]: value })
+  }
 
   const handleRatingChange = (index: number, value: number) => {
-    const updatedRatings = [...(formData.ratings || [])];
-    updatedRatings[index].value = value;
-    setFormData({ ...formData, ratings: updatedRatings });
-  };
+    const updatedRatings = [...(formData.ratings || [])]
+    updatedRatings[index].value = value
+    setFormData({ ...formData, ratings: updatedRatings })
+  }
 
   const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
+    event.preventDefault()
 
     if (!formData.student_name || !formData.activity || !formData.teacher_comment) {
-      console.error("必須フィールドが入力されていません。");
-      return;
+      console.error("必須フィールドが入力されていません。")
+      return
     }
 
     const completedData: AchievementData = {
@@ -55,153 +62,105 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
       progress: formData.progress || "未設定",
       progress_percentage: formData.progress_percentage || 0,
       ratings: formData.ratings || [],
-      xp_earned: formData.xp_earned || 0,
       teacher_comment: formData.teacher_comment || "",
-    };
+      xp_earned: 0
+    }
 
-    onSubmit(completedData);
-  };
+    onSubmit(completedData)
+  }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-6 bg-gray-100 rounded shadow-md">
-      <div>
-        <label htmlFor="student_name" className="block text-gray-700 font-bold mb-1">生徒名:</label>
-        <input
-          type="text"
-          id="student_name"
-          name="student_name"
-          value={formData.student_name || ""}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-          required
-        />
-      </div>
-
-     <div>
-  <label htmlFor="date" className="block text-gray-700 font-bold mb-1">日付:</label>
-  <input
-    type="text" // 自由入力を許可
-    id="date"
-    name="date"
-    value={formData.date || ""} // `undefined` の場合は空文字列を表示
-    onChange={(e) => {
-      const value = e.target.value;
-      const sanitizedValue = value
-        .replace(/[^0-9]/g, "") // 半角数字以外を削除
-        .slice(0, 8); // 8桁以上を切り捨て
-
-      setFormData({ ...formData, date: sanitizedValue });
-    }}
-    onBlur={(e) => {
-      // カスタムバリデーション
-      if ((formData.date || "").length !== 8) { // `formData.date` が `undefined` の場合に対応
-        alert("日付は8桁の半角数字 (yyyyMMdd) で入力してください");
-        setFormData({ ...formData, date: "" }); // 不正入力をリセット
-      }
-    }}
-    className="w-full p-2 border border-gray-300 rounded"
-    placeholder="yyyyMMdd" // 入力例を表示
-    required
-  />
-</div>
-
-      <div>
-        <label htmlFor="activity" className="block text-gray-700 font-bold mb-1">活動内容:</label>
-        <input
-          type="text"
-          id="activity"
-          name="activity"
-          value={formData.activity || ""}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-          required
-        />
-      </div>
-
-      <div>
-        <label htmlFor="goal" className="block text-gray-700 font-bold mb-1">目標:</label>
-        <input
-          type="text"
-          id="goal"
-          name="goal"
-          value={formData.goal || ""}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="progress" className="block text-gray-700 font-bold mb-1">進捗:</label>
-        <input
-          type="text"
-          id="progress"
-          name="progress"
-          value={formData.progress || ""}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="progress_percentage" className="block text-gray-700 font-bold mb-1">進捗率 (%):</label>
-        <input
-          type="number"
-          id="progress_percentage"
-          name="progress_percentage"
-          value={formData.progress_percentage || ""}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="xp_earned" className="block text-gray-700 font-bold mb-1">獲得XP:</label>
-        <input
-          type="number"
-          id="xp_earned"
-          name="xp_earned"
-          value={formData.xp_earned || ""}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-      </div>
-
-      {/* 評価セクション */}
-      <div>
-        <h3 className="text-lg font-bold text-gray-700 mb-4">評価セクション:</h3>
-        {(formData.ratings || []).map((rating, index) => (
-          <div key={index} className="mb-4">
-            <label className="block text-gray-700 font-bold mb-1">{rating.skill}:</label>
-            <input
-              type="range"
-              min="1"
-              max="5"
-              value={rating.value}
-              onChange={(e) => handleRatingChange(index, Number(e.target.value))}
-              className="w-full"
-            />
-            <p className="text-sm text-gray-600 mt-1">現在の評価: {rating.value}</p>
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle>学習記録フォーム</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="student_name">生徒名</Label>
+              <Input
+                id="student_name"
+                name="student_name"
+                value={formData.student_name || ""}
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="date">日付</Label>
+              <DatePicker
+                id="date"
+                name="date"
+                value={formData.date || ""}
+                onChange={(value) => setFormData({ ...formData, date: value })}
+              />
+            </div>
           </div>
-        ))}
-      </div>
 
-      <div>
-        <label htmlFor="teacher_comment" className="block text-gray-700 font-bold mb-1">コメント:</label>
-        <textarea
-          id="teacher_comment"
-          name="teacher_comment"
-          value={formData.teacher_comment || ""}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-          required
-        />
-      </div>
+          <div className="space-y-2">
+            <Label htmlFor="activity">活動内容</Label>
+            <Input
+              id="activity"
+              name="activity"
+              value={formData.activity || ""}
+              onChange={handleChange}
+              required
+            />
+          </div>
 
-      <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
-        更新
-      </button>
-    </form>
-  );
-};
+          <div className="space-y-2">
+            <Label htmlFor="goal">目標</Label>
+            <Input
+              id="goal"
+              name="goal"
+              value={formData.goal || ""}
+              onChange={handleChange}
+            />
+          </div>
 
-export default AchievementForm;
+          <div className="space-y-2">
+            <Label htmlFor="progress_percentage">進捗率</Label>
+            <ProgressInput
+              id="progress_percentage"
+              name="progress_percentage"
+              value={formData.progress_percentage || 0}
+              onChange={(value) => setFormData({ ...formData, progress_percentage: value })}
+            />
+          </div>
+
+          <div className="space-y-4">
+            <Label>評価セクション</Label>
+            {(formData.ratings || []).map((rating, index) => (
+              <div key={index} className="flex items-center justify-between">
+                <span>{rating.skill}</span>
+                <StarRating
+                  value={rating.value}
+                  onChange={(value) => handleRatingChange(index, value)}
+                />
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="teacher_comment">コメント</Label>
+            <Textarea
+              id="teacher_comment"
+              name="teacher_comment"
+              value={formData.teacher_comment || ""}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <Button type="submit" className="w-full">
+            更新
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  )
+}
+
+export default AchievementForm
+
