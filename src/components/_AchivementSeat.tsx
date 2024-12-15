@@ -41,6 +41,7 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
 
   return (
     <div className="container mx-auto p-6 space-y-8 bg-white min-h-screen">
+      {/* Title */}
       <motion.div
         className="bg-black text-white p-8 rounded-lg shadow-lg"
         initial="hidden"
@@ -51,7 +52,59 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
         <h1 className="text-4xl font-bold text-center">アチーブメントシート</h1>
       </motion.div>
 
-      {/* 評価セクション */}
+      {/* Basic Information Section */}
+      <motion.div
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+        variants={fadeIn}
+        initial="hidden"
+        animate="visible"
+        transition={{ delay: 0.2 }}
+      >
+        {/* Student Information */}
+        <Card className="bg-white border-gray-200 shadow-md">
+          <CardContent>
+            <h2 className="text-lg font-bold">生徒情報</h2>
+            <p className="text-gray-700"><strong>生徒名:</strong> {data.student_name}</p>
+            <p className="text-gray-700"><strong>日付:</strong> {data.date}</p>
+          </CardContent>
+        </Card>
+
+        {/* Teacher Information */}
+        <Card className="bg-white border-gray-200 shadow-md">
+          <CardContent>
+            <h2 className="text-lg font-bold">担当者情報</h2>
+            <p className="text-gray-700"><strong>担当者:</strong> {data.teacher}</p>
+            <p className="text-gray-700"><strong>活動内容:</strong> {data.activity}</p>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Goal and Progress Section */}
+      <motion.div
+        variants={fadeIn}
+        initial="hidden"
+        animate="visible"
+        transition={{ delay: 0.3 }}
+      >
+        <Card className="bg-white border-gray-200 shadow-md">
+          <CardHeader>
+            <CardTitle className="text-2xl text-black">目標と進捗</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700"><strong>目標:</strong> {data.goal}</p>
+            <p className="text-gray-700"><strong>進捗:</strong> {data.progress}</p>
+            <div className="relative w-full bg-gray-200 rounded h-4 overflow-hidden">
+              <div
+                className="absolute top-0 left-0 h-full bg-gray-600"
+                style={{ width: `${data.progress_percentage}%` }}
+              ></div>
+            </div>
+            <p className="text-right text-sm text-gray-500">{data.progress_percentage}% 完了</p>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Evaluation Section */}
       <motion.div
         variants={fadeIn}
         initial="hidden"
@@ -67,16 +120,12 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
               <ResponsiveContainer width="100%" height={400}>
                 <RadarChart data={data.ratings}>
                   <PolarGrid stroke="#e2e8f0" />
-                  <PolarAngleAxis
-                    dataKey="skill"
-                    tick={{ fill: "#4a5568" }}
-                  />
-                  {/* スケールを 0 ~ 5 に固定 */}
+                  <PolarAngleAxis dataKey="skill" tick={{ fill: "#4a5568" }} />
                   <PolarRadiusAxis
-                    domain={[0, 5]} // スケールを0~5に固定
+                    domain={[0, 5]}
                     tick={{ fill: "#4a5568" }}
                     axisLine={false}
-                    tickFormatter={() => ""} // 数字を非表示
+                    tickFormatter={() => ""}
                     tickCount={6}
                   />
                   <Radar
@@ -91,6 +140,42 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Teacher's Comment Section */}
+      <motion.div
+        variants={fadeIn}
+        initial="hidden"
+        animate="visible"
+        transition={{ delay: 0.5 }}
+      >
+        <Card className="bg-white border-gray-200 shadow-md">
+          <CardHeader>
+            <CardTitle className="text-2xl text-black">振り返り</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700 text-lg italic">&ldquo;{data.teacher_comment}&rdquo;</p>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Experience Points Section */}
+      <motion.div
+        variants={fadeIn}
+        initial="hidden"
+        animate="visible"
+        transition={{ delay: 0.6 }}
+      >
+        <Card className="bg-white border-gray-200 shadow-md">
+          <CardHeader>
+            <CardTitle className="text-2xl text-black">獲得XP</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700 text-lg">このセッションで獲得したXP: <strong>{data.xp_earned} XP</strong></p>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 };
+
+export default AchievementSheet;
