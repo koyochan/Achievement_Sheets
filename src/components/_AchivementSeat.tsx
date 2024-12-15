@@ -166,7 +166,12 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
               <div className="space-y-2">
                 <p className="text-lg font-semibold text-black">進捗:</p>
                 <p className="text-gray-700 mb-2">{data.progress}</p>
-                <Progress value={data.progress_percentage} className="w-full bg-gray-200" indicatorColor="bg-gray-600" />
+                <div className="relative w-full bg-gray-200 rounded h-4 overflow-hidden">
+                  <div
+                    className="absolute top-0 left-0 h-full bg-gray-600"
+                    style={{ width: `${data.progress_percentage}%` }}
+                  ></div>
+                </div>
                 <p className="text-right text-sm text-gray-500">{data.progress_percentage}% 完了</p>
               </div>
             </div>
