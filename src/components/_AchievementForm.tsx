@@ -48,15 +48,15 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
 
     const completedData: AchievementData = {
       student_name: formData.student_name || "",
-      activity: formData.activity || "",
-      teacher_comment: formData.teacher_comment || "",
       date: formData.date || new Date().toISOString().split("T")[0],
       teacher: formData.teacher || "未設定",
+      activity: formData.activity || "",
       goal: formData.goal || "未設定",
       progress: formData.progress || "未設定",
       progress_percentage: formData.progress_percentage || 0,
       ratings: formData.ratings || [],
       xp_earned: formData.xp_earned || 0,
+      teacher_comment: formData.teacher_comment || "",
     };
 
     onSubmit(completedData);
@@ -78,6 +78,30 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
       </div>
 
       <div>
+        <label htmlFor="date" className="block text-gray-700 font-bold mb-1">日付:</label>
+        <input
+          type="date"
+          id="date"
+          name="date"
+          value={formData.date || ""}
+          onChange={handleChange}
+          className="w-full p-2 border border-gray-300 rounded"
+        />
+      </div>
+
+      <div>
+        <label htmlFor="teacher" className="block text-gray-700 font-bold mb-1">担当者:</label>
+        <input
+          type="text"
+          id="teacher"
+          name="teacher"
+          value={formData.teacher || ""}
+          onChange={handleChange}
+          className="w-full p-2 border border-gray-300 rounded"
+        />
+      </div>
+
+      <div>
         <label htmlFor="activity" className="block text-gray-700 font-bold mb-1">活動内容:</label>
         <input
           type="text"
@@ -91,14 +115,26 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
       </div>
 
       <div>
-        <label htmlFor="teacher_comment" className="block text-gray-700 font-bold mb-1">コメント:</label>
-        <textarea
-          id="teacher_comment"
-          name="teacher_comment"
-          value={formData.teacher_comment || ""}
+        <label htmlFor="goal" className="block text-gray-700 font-bold mb-1">目標:</label>
+        <input
+          type="text"
+          id="goal"
+          name="goal"
+          value={formData.goal || ""}
           onChange={handleChange}
           className="w-full p-2 border border-gray-300 rounded"
-          required
+        />
+      </div>
+
+      <div>
+        <label htmlFor="progress" className="block text-gray-700 font-bold mb-1">進捗:</label>
+        <input
+          type="text"
+          id="progress"
+          name="progress"
+          value={formData.progress || ""}
+          onChange={handleChange}
+          className="w-full p-2 border border-gray-300 rounded"
         />
       </div>
 
@@ -143,6 +179,18 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
             <p className="text-sm text-gray-600 mt-1">現在の評価: {rating.value}</p>
           </div>
         ))}
+      </div>
+
+      <div>
+        <label htmlFor="teacher_comment" className="block text-gray-700 font-bold mb-1">コメント:</label>
+        <textarea
+          id="teacher_comment"
+          name="teacher_comment"
+          value={formData.teacher_comment || ""}
+          onChange={handleChange}
+          className="w-full p-2 border border-gray-300 rounded"
+          required
+        />
       </div>
 
       <button type="submit" className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
