@@ -77,29 +77,33 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
         />
       </div>
 
-      <div>
-        <label htmlFor="date" className="block text-gray-700 font-bold mb-1">日付:</label>
-        <input
-          type="date"
-          id="date"
-          name="date"
-          value={formData.date || ""}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-      </div>
+     <div>
+  <label htmlFor="date" className="block text-gray-700 font-bold mb-1">日付:</label>
+  <input
+    type="text" // 自由入力を許可
+    id="date"
+    name="date"
+    value={formData.date || ""} // `undefined` の場合は空文字列を表示
+    onChange={(e) => {
+      const value = e.target.value;
+      const sanitizedValue = value
+        .replace(/[^0-9]/g, "") // 半角数字以外を削除
+        .slice(0, 8); // 8桁以上を切り捨て
 
-      <div>
-        <label htmlFor="teacher" className="block text-gray-700 font-bold mb-1">担当者:</label>
-        <input
-          type="text"
-          id="teacher"
-          name="teacher"
-          value={formData.teacher || ""}
-          onChange={handleChange}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-      </div>
+      setFormData({ ...formData, date: sanitizedValue });
+    }}
+    onBlur={(e) => {
+      // カスタムバリデーション
+      if ((formData.date || "").length !== 8) { // `formData.date` が `undefined` の場合に対応
+        alert("日付は8桁の半角数字 (yyyyMMdd) で入力してください");
+        setFormData({ ...formData, date: "" }); // 不正入力をリセット
+      }
+    }}
+    className="w-full p-2 border border-gray-300 rounded"
+    placeholder="yyyyMMdd" // 入力例を表示
+    required
+  />
+</div>
 
       <div>
         <label htmlFor="activity" className="block text-gray-700 font-bold mb-1">活動内容:</label>
