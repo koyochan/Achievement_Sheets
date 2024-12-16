@@ -1,7 +1,12 @@
+ER図
+
 ```mermaid
 erDiagram
     User {
         string UUID
+        number currentLevel
+        number currentXp
+        number nextLevelXp
     }
 
     AchievementSheet {
