@@ -1,3 +1,4 @@
+```mermaid
 erDiagram
     User {
         string UUID
