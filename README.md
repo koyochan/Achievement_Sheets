@@ -30,7 +30,6 @@ erDiagram
 
     %% 横並びで関係を表現
     User ||--o{ UUID : "has"
-    User ||--o{ AchievementSheet : "has"
     AchievementSheet ||--o{ Rating : "has"
     User ||--o{ UUID : "has"
     UUID ||--o{ AchievementSheet : "has"
