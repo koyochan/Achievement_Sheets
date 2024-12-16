@@ -1,9 +1,9 @@
-ER図
-
-```mermaid
 erDiagram
     User {
         string UUID
+    }
+
+    UUID {
         number currentLevel
         number currentXp
         number nextLevelXp
@@ -27,5 +27,6 @@ erDiagram
         number value
     }
 
-    User ||--o{ AchievementSheet : "has"
+    User ||--o{ UUID : "has"
+    UUID123 ||--o{ AchievementSheet : "has"
     AchievementSheet ||--o{ Rating : "has"
