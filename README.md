@@ -29,5 +29,5 @@ erDiagram
     }
 
     User ||--o{ UUID : "has"
-    UUID123 ||--o{ AchievementSheet : "has"
+    UUID ||--o{ AchievementSheet : "has"
     AchievementSheet ||--o{ Rating : "has"
