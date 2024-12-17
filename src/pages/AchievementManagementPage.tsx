@@ -27,6 +27,7 @@ const AchievementManagementPage: React.FC = () => {
 
       // Firestore にデータを送信
       await saveAchievementToFirestore(userId, dataWithXp);
+      
 
       setSubmittedData(dataWithXp); // 保存が成功したら画面を切り替える
     } catch (error) {
