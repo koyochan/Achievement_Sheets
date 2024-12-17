@@ -170,7 +170,9 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
             <CardTitle className="text-2xl text-black">獲得XP</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-gray-700 text-lg">このセッションで獲得したXP: <strong>{data.xp_earned} XP</strong></p>
+            <p className="text-gray-700 text-lg">
+              <strong>{data.xp_earned} XP</strong>
+            </p>
           </CardContent>
         </Card>
       </motion.div>
