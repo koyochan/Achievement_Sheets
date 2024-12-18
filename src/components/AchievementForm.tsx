@@ -53,7 +53,6 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
       return;
     }
 
-    // 確認ダイアログを表示
     const confirmed = window.confirm("Firestoreの情報が更新されます。本当によろしいですか？");
 
     if (!confirmed) {
@@ -74,7 +73,6 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
       xp_earned: 0,
     };
 
-    // データ送信
     onSubmit(completedData);
   };
 
