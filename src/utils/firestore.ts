@@ -1,5 +1,5 @@
 import { getFirestore, collection, doc, setDoc } from "firebase/firestore";
-import { AchievementData } from "@/components/_AchivementSeat";
+import { AchievementData } from "@/components/AchievementSheet";
 import { db } from "./firebase"; // Firebase 初期化ファイル
 
 /**
