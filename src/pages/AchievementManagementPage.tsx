@@ -43,7 +43,7 @@ const AchievementManagementPage: React.FC = () => {
 
       {/* AchievementForm の表示制御 */}
       {!submittedData ? (
-        <AchievementForm 
+        <AchievementForm
           onSubmit={handleFormSubmit} 
           initialData={{}} 
         />
