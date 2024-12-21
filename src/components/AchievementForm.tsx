@@ -107,54 +107,153 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>学習記録フォーム</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="space-y-4">
-            {/* 他のフィールド */}
-            <div className="space-y-2">
-              <Label htmlFor="start_time">開始時間</Label>
-              <select
-                id="start_time"
-                name="start_time"
-                value={formData.start_time || 0}
-                onChange={handleTimeSelectChange}
-                className="w-full border p-2 rounded"
-              >
-                {timeOptions.map((time) => (
-                  <option key={time} value={time}>
-                    {time}
-                  </option>
-                ))}
-              </select>
-            </div>
+  <CardHeader>
+    <CardTitle>学習記録フォーム</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="student_name">生徒名</Label>
+          <Input
+            id="student_name"
+            name="student_name"
+            value={formData.student_name || ""}
+            onChange={handleChange}
+            required
+          />
+        </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="end_time">終了時間</Label>
-              <select
-                id="end_time"
-                name="end_time"
-                value={formData.end_time || 0}
-                onChange={handleTimeSelectChange}
-                className="w-full border p-2 rounded"
-              >
-                {timeOptions.map((time) => (
-                  <option key={time} value={time}>
-                    {time}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="teacher">担当教師</Label>
+          <Input
+            id="teacher"
+            name="teacher"
+            value={formData.teacher || ""}
+            onChange={handleChange}
+          />
+        </div>
 
-          <Button type="submit" className="w-full">
-            更新
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+        <div className="space-y-2">
+          <Label htmlFor="date">日付</Label>
+          <DatePicker
+            id="date"
+            name="date"
+            value={formData.date || ""}
+            onChange={(value) => setFormData({ ...formData, date: value })}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="activity">活動内容</Label>
+          <Input
+            id="activity"
+            name="activity"
+            value={formData.activity || ""}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="goal">目標</Label>
+          <Input
+            id="goal"
+            name="goal"
+            value={formData.goal || ""}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="progress">進捗状況</Label>
+          <Input
+            id="progress"
+            name="progress"
+            value={formData.progress || ""}
+            onChange={handleChange}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="progress_percentage">進捗率</Label>
+          <ProgressInput
+            id="progress_percentage"
+            name="progress_percentage"
+            value={formData.progress_percentage || 0}
+            onChange={(value) => setFormData({ ...formData, progress_percentage: value })}
+          />
+        </div>
+
+        <div className="space-y-4">
+          <Label>評価セクション</Label>
+          {(formData.ratings || []).map((rating, index) => (
+            <div key={index} className="flex items-center justify-between">
+              <span>{rating.skill}</span>
+              <StarRating
+                value={rating.value}
+                onChange={(value) => handleRatingChange(index, value)}
+              />
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="teacher_comment">コメント</Label>
+          <Textarea
+            id="teacher_comment"
+            name="teacher_comment"
+            value={formData.teacher_comment || ""}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="start_time">開始時間</Label>
+          <select
+            id="start_time"
+            name="start_time"
+            value={formData.start_time || 0}
+            onChange={(e) =>
+              setFormData({ ...formData, start_time: timeStringToNumber(e.target.value) })
+            }
+            className="w-full border p-2 rounded"
+          >
+            {timeOptions.map((time) => (
+              <option key={time} value={time}>
+                {time}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="end_time">終了時間</Label>
+          <select
+            id="end_time"
+            name="end_time"
+            value={formData.end_time || 0}
+            onChange={(e) =>
+              setFormData({ ...formData, end_time: timeStringToNumber(e.target.value) })
+            }
+            className="w-full border p-2 rounded"
+          >
+            {timeOptions.map((time) => (
+              <option key={time} value={time}>
+                {time}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <Button type="submit" className="w-full">
+        更新
+      </Button>
+    </form>
+  </CardContent>
+</Card>
   );
 };
 
