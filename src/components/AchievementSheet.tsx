@@ -42,6 +42,12 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
     visible: { opacity: 1, y: 0 },
   };
 
+  const formatDuration = (duration: number): string => {
+    const hours = Math.floor(duration / 60);
+    const minutes = duration % 60;
+    return `${hours}時間${minutes}分`;
+  };
+
   return (
     <div className="container mx-auto p-6 space-y-8 bg-white min-h-screen">
       {/* Title */}
@@ -143,6 +149,26 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Duration Section */}
+      <motion.div
+        variants={fadeIn}
+        initial="hidden"
+        animate="visible"
+        transition={{ delay: 0.5 }}
+      >
+        <Card className="bg-white border-gray-200 shadow-md">
+          <CardHeader>
+            <CardTitle className="text-2xl text-black">滞在時間</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700 text-lg">
+              <strong>{formatDuration(data.duration)}</strong>
+            </p>
+          </CardContent>
+        </Card>
+      </motion.div>
+
 
       {/* Teacher's Comment Section */}
       <motion.div
