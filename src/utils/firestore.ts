@@ -21,6 +21,7 @@ const generateCustomId = (random: string, name: string, date: string, duration: 
   return `${random}?name=${name}&date=${date}&duration=${duration}`;
 };
 
+
 /**
  * Firestoreにデータを保存
  */
@@ -29,11 +30,11 @@ export const saveAchievementToFirestore = async (userId: string, data: Achieveme
     // 必要な情報をAchievementDataから取得
     const studentName = data.student_name; // AchievementDataから名前を取得
     const date = data.date; // AchievementDataから日付を取得
-    const duration = data.duration; // AchievementDataから滞在時間を取得
+    const duration = data.duration; // AchievementDataから稼働時間を取得
 
     // カスタムIDを生成
     const randomString = generateRandomString(10);
-    const customId = generateCustomId(randomString, studentName, date, duration);
+    const customId = generateCustomId(randomString, studentName, date, String(duration));
 
     // Firestoreの参照を作成
     const achievementRef = doc(collection(db, "Attendance"), customId);

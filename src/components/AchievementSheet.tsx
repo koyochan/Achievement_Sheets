@@ -27,6 +27,7 @@ export interface AchievementData {
   teacher_comment: string;
   start_time: number;
   end_time: number;
+  duration: number;
 }
 
 interface AchievementSheetProps {

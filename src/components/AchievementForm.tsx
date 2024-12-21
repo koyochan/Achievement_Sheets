@@ -31,6 +31,9 @@ const generateTimeOptions = () => {
 
 const timeOptions = generateTimeOptions();
 
+const calculateDurationInMinutes = (start_time: number, end_time: number): number => {
+  return end_time - start_time; // 分単位での差を返す
+};
 
 const numberToTimeString = (minutes: number): string => {
   const hours = Math.floor(minutes / 60).toString().padStart(2, "0");
@@ -64,7 +67,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
   };
-
+  
   const handleRatingChange = (index: number, value: number) => {
     const updatedRatings = [...(formData.ratings || [])];
     updatedRatings[index].value = value;
@@ -99,6 +102,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
       xp_earned: 0,
       start_time: formData.start_time || 0,
       end_time: formData.end_time || 0,
+      duration: calculateDurationInMinutes(formData.start_time || 0, formData.end_time || 0), // durationを分単位で計算
     };
 
     onSubmit(completedData);
