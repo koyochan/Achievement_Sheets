@@ -18,7 +18,7 @@ const generateRandomString = (length: number): string => {
  * 指定された形式のIDを生成
  */
 const generateCustomId = (random: string, name: string, date: string, duration: string): string => {
-  return `${random}&name=${name}&date=${date}&duration=${duration}`;
+  return `${random}?name=${name}&date=${date}&duration=${duration}`;
 };
 
 /**

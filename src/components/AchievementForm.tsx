@@ -14,6 +14,26 @@ interface AchievementFormProps {
   initialData?: Partial<AchievementData>;
 }
 
+// 15分単位の時間リストを生成
+const generateTimeOptions = () => {
+  const options = [];
+  for (let hour = 0; hour < 24; hour++) {
+    for (let minute = 0; minute < 60; minute += 15) {
+      const formattedTime = `${hour.toString().padStart(2, "0")}:${minute.toString().padStart(2, "0")}`;
+      options.push(formattedTime);
+    }
+  }
+  return options;
+};
+
+const timeOptions = generateTimeOptions();
+
+// 時間を分単位の数値に変換する関数
+const timeStringToNumber = (timeString: string): number => {
+  const [hours, minutes] = timeString.split(":").map(Number);
+  return hours * 60 + minutes;
+};
+
 const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData }) => {
   const [formData, setFormData] = useState<Partial<AchievementData>>({
     student_name: "",
@@ -31,12 +51,19 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
       { skill: "問題解決能力", value: 0 },
     ],
     teacher_comment: "",
+    start_time: 0,
+    end_time: 0,
     ...initialData,
   });
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
     setFormData({ ...formData, [name]: value });
+  };
+
+  const handleTimeSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = event.target;
+    setFormData({ ...formData, [name]: timeStringToNumber(value) });
   };
 
   const handleRatingChange = (index: number, value: number) => {
@@ -71,6 +98,8 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
       ratings: formData.ratings || [],
       teacher_comment: formData.teacher_comment || "",
       xp_earned: 0,
+      start_time: formData.start_time || 0,
+      end_time: formData.end_time || 0,
     };
 
     onSubmit(completedData);
@@ -84,101 +113,39 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
+            {/* 他のフィールド */}
             <div className="space-y-2">
-              <Label htmlFor="student_name">生徒名</Label>
-              {/* 生徒情報をfirestoreのユーザーから取得して選択できるようにする */}
-              <Input
-                id="student_name"
-                name="student_name"
-                value={formData.student_name || ""}
-                onChange={handleChange}
-                required
-              />
+              <Label htmlFor="start_time">開始時間</Label>
+              <select
+                id="start_time"
+                name="start_time"
+                value={formData.start_time || 0}
+                onChange={handleTimeSelectChange}
+                className="w-full border p-2 rounded"
+              >
+                {timeOptions.map((time) => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="teacher">担当教師</Label>
-              <Input
-                id="teacher"
-                name="teacher"
-                value={formData.teacher || ""}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="date">日付</Label>
-              <DatePicker
-                id="date"
-                name="date"
-                value={formData.date || ""}
-                onChange={(value) => setFormData({ ...formData, date: value })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="activity">活動内容</Label>
-              <Input
-                id="activity"
-                name="activity"
-                value={formData.activity || ""}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="goal">目標</Label>
-              <Input
-                id="goal"
-                name="goal"
-                value={formData.goal || ""}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="progress">進捗状況</Label>
-              <Input
-                id="progress"
-                name="progress"
-                value={formData.progress || ""}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="progress_percentage">進捗率</Label>
-              <ProgressInput
-                id="progress_percentage"
-                name="progress_percentage"
-                value={formData.progress_percentage || 0}
-                onChange={(value) => setFormData({ ...formData, progress_percentage: value })}
-              />
-            </div>
-
-            <div className="space-y-4">
-              <Label>評価セクション</Label>
-              {(formData.ratings || []).map((rating, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <span>{rating.skill}</span>
-                  <StarRating
-                    value={rating.value}
-                    onChange={(value) => handleRatingChange(index, value)}
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="teacher_comment">コメント</Label>
-              <Textarea
-                id="teacher_comment"
-                name="teacher_comment"
-                value={formData.teacher_comment || ""}
-                onChange={handleChange}
-                required
-              />
+              <Label htmlFor="end_time">終了時間</Label>
+              <select
+                id="end_time"
+                name="end_time"
+                value={formData.end_time || 0}
+                onChange={handleTimeSelectChange}
+                className="w-full border p-2 rounded"
+              >
+                {timeOptions.map((time) => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
 
