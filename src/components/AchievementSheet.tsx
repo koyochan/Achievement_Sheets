@@ -25,6 +25,8 @@ export interface AchievementData {
   ratings: Rating[];
   xp_earned: number;
   teacher_comment: string;
+  start_time: number;
+  end_time: number;
 }
 
 interface AchievementSheetProps {
