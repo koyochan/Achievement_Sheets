@@ -22,7 +22,7 @@ export const saveAchievementToFirestore = async (userId: string, data: Achieveme
     const timestampId = generateTimestampId();
 
     // 指定した ID を使用してドキュメントを作成
-    const achievementRef = doc(collection(db, `User/${userId}/AchievementSheet`), timestampId);
+    const achievementRef = doc(collection(db, `Attendance/`), timestampId);
     await setDoc(achievementRef, data);
 
     console.log("データが保存されました:", data);

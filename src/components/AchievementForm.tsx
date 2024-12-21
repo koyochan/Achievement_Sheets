@@ -86,7 +86,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit, initialData
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="student_name">生徒名</Label>
-              // 生徒情報をfirestoreのユーザーから取得
+              {/* 生徒情報をfirestoreのユーザーから取得して選択できるようにする */}
               <Input
                 id="student_name"
                 name="student_name"
