@@ -16,6 +16,7 @@ interface Rating {
 
 export interface AchievementData {
   student_name: string;
+  UUID: string;
   date: string;
   teacher: string;
   activity: string;

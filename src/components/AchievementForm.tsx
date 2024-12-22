@@ -67,6 +67,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
     teacher_comment: "",
     start_time: 0,
     end_time: 0,
+    UUID: "",
   });
 
   const handleSearch = async () => {
@@ -138,6 +139,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
       start_time: formData.start_time || 0,
       end_time: formData.end_time || 0,
       duration: calculateDurationInMinutes(formData.start_time || 0, formData.end_time || 0),
+      UUID: "",
     };
 
     onSubmit(completedData);
