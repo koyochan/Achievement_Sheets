@@ -38,14 +38,11 @@ const numberToTimeString = (minutes: number): string => {
   return `${hours}:${mins}`;
 };
 
-const calculateDurationInMinutes = (start_time: number, end_time: number): number => {
-  return end_time - start_time; // 分単位での差を返す
-};
-
 const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [results, setResults] = useState<Student[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null); // 選択された生徒を保持する状態
   const [formData, setFormData] = useState<Partial<AchievementData>>({
     student_name: "",
     date: "",
@@ -64,7 +61,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
     teacher_comment: "",
     start_time: 0,
     end_time: 0,
-    UUID: "", // 初期値
+    UUID: "",
   });
 
   useEffect(() => {
@@ -98,7 +95,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
               doc.data().name.toLowerCase().includes(searchTerm.toLowerCase())
           )
           .map((doc) => ({
-            id: doc.id, // UUID として扱う
+            id: doc.id,
             name: doc.data().name,
           }));
 
@@ -110,8 +107,8 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
       }
     };
 
-    const timeoutId = setTimeout(fetchSuggestions, 300); // 入力後300ms待機してから検索を実行
-    return () => clearTimeout(timeoutId); // 前回のタイムアウトをクリア
+    const timeoutId = setTimeout(fetchSuggestions, 300);
+    return () => clearTimeout(timeoutId);
   }, [searchTerm]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -119,13 +116,8 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleRatingChange = (index: number, value: number) => {
-    const updatedRatings = [...(formData.ratings || [])];
-    updatedRatings[index].value = value;
-    setFormData({ ...formData, ratings: updatedRatings });
-  };
-
   const handleStudentSelect = (student: Student) => {
+    setSelectedStudent(student); // 選択された生徒を保存
     setFormData({
       ...formData,
       student_name: student.name,
@@ -138,9 +130,12 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
+    if (!formData.start_time || !formData.end_time || formData.start_time >= formData.end_time) {
+      alert("終了時間は開始時間より後である必要があります。");
+      return;
+    }
 
-    
-    onSubmit(formData as AchievementData); // AchievementData の型にキャストして送信
+    onSubmit(formData as AchievementData);
   };
 
   return (
@@ -166,7 +161,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
                 {results.map((student) => (
                   <li
                     key={student.id}
-                    onClick={() => handleStudentSelect(student)} // 学生を選択
+                    onClick={() => handleStudentSelect(student)}
                     className="p-2 cursor-pointer hover:bg-gray-200"
                   >
                     {student.name}
@@ -177,6 +172,13 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
                 )}
               </ul>
             </div>
+
+            {/* 選択された生徒名を表示 */}
+            {selectedStudent && (
+              <div className="p-4 border rounded bg-gray-50">
+                <p>生徒名: <strong>{selectedStudent.name}</strong></p>
+              </div>
+            )}
 
             {/* 他のフィールド */}
             <div className="space-y-2">
@@ -241,7 +243,11 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
                   <span>{rating.skill}</span>
                   <StarRating
                     value={rating.value}
-                    onChange={(value) => handleRatingChange(index, value)}
+                    onChange={(value) => {
+                      const updatedRatings = [...(formData.ratings || [])];
+                      updatedRatings[index].value = value;
+                      setFormData({ ...formData, ratings: updatedRatings });
+                    }}
                   />
                 </div>
               ))}
@@ -257,43 +263,43 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
               />
             </div>
             <div className="space-y-2">
-  <Label htmlFor="start_time">開始時間</Label>
-  <select
-    id="start_time"
-    name="start_time"
-    value={formData.start_time}
-    onChange={(e) => {
-      const newStartTime = Number(e.target.value);
-      setFormData({ ...formData, start_time: newStartTime });
-
-    }}
-    className="w-full border p-2 rounded"
-  >
-    {timeOptions.map((minutes) => (
-      <option key={minutes} value={minutes}>
-        {numberToTimeString(minutes)}
-      </option>
-    ))}
-  </select>
-</div>
-<div className="space-y-2">
-  <Label htmlFor="end_time">終了時間</Label>
-  <select
-    id="end_time"
-    name="end_time"
-    value={formData.end_time}
-    onChange={(e) => setFormData({ ...formData, end_time: Number(e.target.value) })}
-    className="w-full border p-2 rounded"
-  >
-    {timeOptions
-      .filter((minutes) => minutes > (formData.start_time || 0)) // start_time より大きい時間のみ
-      .map((minutes) => (
-        <option key={minutes} value={minutes}>
-          {numberToTimeString(minutes)}
-        </option>
-      ))}
-  </select>
-</div>
+              <Label htmlFor="start_time">開始時間</Label>
+              <select
+                id="start_time"
+                name="start_time"
+                value={formData.start_time}
+                onChange={(e) =>
+                  setFormData({ ...formData, start_time: Number(e.target.value) })
+                }
+                className="w-full border p-2 rounded"
+              >
+                {timeOptions.map((minutes) => (
+                  <option key={minutes} value={minutes}>
+                    {numberToTimeString(minutes)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="end_time">終了時間</Label>
+              <select
+                id="end_time"
+                name="end_time"
+                value={formData.end_time}
+                onChange={(e) =>
+                  setFormData({ ...formData, end_time: Number(e.target.value) })
+                }
+                className="w-full border p-2 rounded"
+              >
+                {timeOptions
+                  .filter((minutes) => minutes > (formData.start_time || 0))
+                  .map((minutes) => (
+                    <option key={minutes} value={minutes}>
+                      {numberToTimeString(minutes)}
+                    </option>
+                  ))}
+              </select>
+            </div>
           </div>
           <Button type="submit" className="w-full">
             更新
