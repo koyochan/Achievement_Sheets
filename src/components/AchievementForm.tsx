@@ -137,6 +137,10 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+
+    return; // 送信をキャンセル
+  }
+
     onSubmit(formData as AchievementData); // AchievementData の型にキャストして送信
   };
 
@@ -254,37 +258,43 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="start_time">開始時間</Label>
-              <select
-                id="start_time"
-                name="start_time"
-                value={formData.start_time}
-                onChange={(e) => setFormData({ ...formData, start_time: Number(e.target.value) })}
-                className="w-full border p-2 rounded"
-              >
-                {timeOptions.map((minutes) => (
-                  <option key={minutes} value={minutes}>
-                    {numberToTimeString(minutes)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="end_time">終了時間</Label>
-              <select
-                id="end_time"
-                name="end_time"
-                value={formData.end_time}
-                onChange={(e) => setFormData({ ...formData, end_time: Number(e.target.value) })}
-                className="w-full border p-2 rounded"
-              >
-                {timeOptions.map((minutes) => (
-                  <option key={minutes} value={minutes}>
-                    {numberToTimeString(minutes)}
-                  </option>
-                ))}
-              </select>
-            </div>
+  <Label htmlFor="start_time">開始時間</Label>
+  <select
+    id="start_time"
+    name="start_time"
+    value={formData.start_time}
+    onChange={(e) => {
+      const newStartTime = Number(e.target.value);
+      setFormData({ ...formData, start_time: newStartTime });
+
+    }}
+    className="w-full border p-2 rounded"
+  >
+    {timeOptions.map((minutes) => (
+      <option key={minutes} value={minutes}>
+        {numberToTimeString(minutes)}
+      </option>
+    ))}
+  </select>
+</div>
+<div className="space-y-2">
+  <Label htmlFor="end_time">終了時間</Label>
+  <select
+    id="end_time"
+    name="end_time"
+    value={formData.end_time}
+    onChange={(e) => setFormData({ ...formData, end_time: Number(e.target.value) })}
+    className="w-full border p-2 rounded"
+  >
+    {timeOptions
+      .filter((minutes) => minutes > (formData.start_time || 0)) // start_time より大きい時間のみ
+      .map((minutes) => (
+        <option key={minutes} value={minutes}>
+          {numberToTimeString(minutes)}
+        </option>
+      ))}
+  </select>
+</div>
           </div>
           <Button type="submit" className="w-full">
             更新
