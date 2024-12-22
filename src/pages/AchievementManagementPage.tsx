@@ -45,7 +45,6 @@ const AchievementManagementPage: React.FC = () => {
       {!submittedData ? (
         <AchievementForm
           onSubmit={handleFormSubmit} 
-          initialData={{}} 
         />
       ) : (
         <AchievementSheet data={submittedData} />
