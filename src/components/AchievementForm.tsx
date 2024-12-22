@@ -138,9 +138,8 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
 
-    return; // 送信をキャンセル
-  }
 
+    
     onSubmit(formData as AchievementData); // AchievementData の型にキャストして送信
   };
 
