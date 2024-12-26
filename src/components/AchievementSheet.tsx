@@ -16,6 +16,7 @@ interface Rating {
 
 export interface AchievementData {
   student_name: string;
+  UUID: string;
   date: string;
   teacher: string;
   activity: string;
@@ -25,6 +26,9 @@ export interface AchievementData {
   ratings: Rating[];
   xp_earned: number;
   teacher_comment: string;
+  start_time: number;
+  end_time: number;
+  duration: number;
 }
 
 interface AchievementSheetProps {
@@ -37,6 +41,12 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
+  };
+
+  const formatDuration = (duration: number): string => {
+    const hours = Math.floor(duration / 60);
+    const minutes = duration % 60;
+    return `${hours}時間${minutes}分`;
   };
 
   return (
@@ -140,6 +150,26 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
           </CardContent>
         </Card>
       </motion.div>
+
+      {/* Duration Section */}
+      <motion.div
+        variants={fadeIn}
+        initial="hidden"
+        animate="visible"
+        transition={{ delay: 0.5 }}
+      >
+        <Card className="bg-white border-gray-200 shadow-md">
+          <CardHeader>
+            <CardTitle className="text-2xl text-black">滞在時間</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-700 text-lg">
+              <strong>{formatDuration(data.duration)}</strong>
+            </p>
+          </CardContent>
+        </Card>
+      </motion.div>
+
 
       {/* Teacher's Comment Section */}
       <motion.div

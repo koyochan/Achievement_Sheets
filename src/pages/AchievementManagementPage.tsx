@@ -1,39 +1,35 @@
 import React, { useState } from "react";
 import AchievementSheet, { AchievementData } from "@/components/AchievementSheet";
 import AchievementForm from "@/components/AchievementForm";
-import { saveAchievementToFirestore } from "@/utils/firestore"; // Firestore 操作用関数をインポート
-import { calculateXp } from "@/utils/CalculateXp"; // XP 計算用関数をインポート
-
+import { saveAchievementToFirestore } from "@/utils/firestore";
+import { calculateXp } from "@/utils/CalculateXp";
 const AchievementManagementPage: React.FC = () => {
   const [submittedData, setSubmittedData] = useState<AchievementData | null>(null);
-  const [isSaving, setIsSaving] = useState(false); // 保存中の状態を管理
-  const [errorMessage, setErrorMessage] = useState<string | null>(null); // エラー表示用
+  const [isSaving, setIsSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  // フォーム送信ハンドラー
   const handleFormSubmit = async (data: AchievementData) => {
-    const userId = "User123"; // 実際のアプリでは認証システムから取得する
+    const userId = "User123";
     console.log("フォーム送信データ:", data);
 
     try {
-      setIsSaving(true); // 保存中の状態を設定
-      setErrorMessage(null); // エラーリセット
+      setIsSaving(true);
+      setErrorMessage(null);
 
-      // XP を計算
       const xpEarned = calculateXp(data.progress_percentage, data.ratings);
       const dataWithXp = {
         ...data,
-        xp_earned: xpEarned, // 計算結果を追加
+        xp_earned: xpEarned,
       };
 
-      // Firestore にデータを送信
       await saveAchievementToFirestore(userId, dataWithXp);
       
 
-      setSubmittedData(dataWithXp); // 保存が成功したら画面を切り替える
+      setSubmittedData(dataWithXp);
     } catch (error) {
       setErrorMessage("データ保存中にエラーが発生しました。");
     } finally {
-      setIsSaving(false); // 保存完了後に状態をリセット
+      setIsSaving(false);
     }
   };
 
@@ -47,9 +43,8 @@ const AchievementManagementPage: React.FC = () => {
 
       {/* AchievementForm の表示制御 */}
       {!submittedData ? (
-        <AchievementForm 
+        <AchievementForm
           onSubmit={handleFormSubmit} 
-          initialData={{}} 
         />
       ) : (
         <AchievementSheet data={submittedData} />

@@ -1,3 +1,10 @@
+shadcn/ui
+
+https://ui.shadcn.com/docs/installation/astro
+
+
+## やっほー！
+
 ER図
 
 ```mermaid
