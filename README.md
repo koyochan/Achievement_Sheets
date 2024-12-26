@@ -2,8 +2,7 @@ shadcn/ui
 
 https://ui.shadcn.com/docs/installation/astro
 
-
-## やっほー！
+## Components
 
 ER図
 
