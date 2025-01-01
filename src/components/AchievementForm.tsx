@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
-import { AchievementData } from "./AchievementSheet";
+import { AchievementData, skills} from "./AchievementSheet";
 import { db } from "../utils/firebase"; // Firebaseの初期化ファイル
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -64,14 +64,6 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
     end_time: 0,
     UUID: "",
   });
-
-  const skills: string[] = [
-  "集中力",
-  "創造性",
-  "習得度",
-  "コミュニケーション能力",
-  "問題解決能力",
-];
 
   useEffect(() => {
     const fetchSuggestions = async () => {

@@ -3,18 +3,6 @@ import { AchievementData } from "@/components/AchievementSheet";
 import { db } from "./firebase"; // Firebase 初期化ファイル
 
 /**
- * ランダムな文字列を生成
- */
-const generateRandomString = (length: number): string => {
-  const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
-  for (let i = 0; i < length; i++) {
-    result += characters.charAt(Math.floor(Math.random() * characters.length));
-  }
-  return result;
-};
-
-/**
  * 指定された形式のIDを生成
  */
 const generateCustomId = (name: string, date: string, duration: string): string => {

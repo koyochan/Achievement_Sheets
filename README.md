@@ -49,3 +49,7 @@ erDiagram
 ...(スプレッド演算子)データを展開する演算子
 
 Reactの状態管理原則として、Immutability(不変性)を保つ必要があるため、usestateで状態を管理している変数を直接変化させた場合、useefectが状態変化を検知できない場合が存在する。
+
+mapメソッド
+-> (formData.ratings || []).map(rating, index) =>　
+formData.ratings配列に対して、一つ一つアロー関数経由でコールバック関数を実行している。

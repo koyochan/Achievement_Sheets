@@ -10,6 +10,14 @@ import {
 import { motion } from "framer-motion";
 
 
+export const skills: string[] = [
+  "集中力",
+  "創造性",
+  "習得度",
+  "コミュニケーション能力",
+  "問題解決能力",
+];
+
 export interface AchievementData {
   student_name: string;
   UUID: string;
