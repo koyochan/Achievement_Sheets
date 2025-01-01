@@ -9,10 +9,6 @@ import {
 } from "recharts";
 import { motion } from "framer-motion";
 
-interface Rating {
-  skill: string;
-  value: number;
-}
 
 export interface AchievementData {
   student_name: string;
@@ -23,7 +19,7 @@ export interface AchievementData {
   goal: string;
   progress: string;
   progress_percentage: number;
-  ratings: Rating[];
+  ratings: number[];
   xp_earned: number;
   teacher_comment: string;
   start_time: number;

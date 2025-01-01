@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { StarRating } from "./StartRating";
 import { ProgressInput } from "./ProgressInput";
 import { DatePicker } from "./DataPicker";
+import { SkipBack } from "lucide-react";
 
 interface Student {
   id: string;
@@ -52,17 +53,25 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
     progress: "",
     progress_percentage: 0,
     ratings: [
-      { skill: "集中力", value: 0 },
-      { skill: "創造性", value: 0 },
-      { skill: "習得度", value: 0 },
-      { skill: "コミュニケーション能力", value: 0 },
-      { skill: "問題解決能力", value: 0 },
+      0,
+      0,
+      0,
+      0,
+      0,
     ],
     teacher_comment: "",
     start_time: 0,
     end_time: 0,
     UUID: "",
   });
+
+  const skills: string[] = [
+  "集中力",
+  "創造性",
+  "習得度",
+  "コミュニケーション能力",
+  "問題解決能力",
+];
 
   useEffect(() => {
     const fetchSuggestions = async () => {
@@ -74,7 +83,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
       setLoading(true);
 
       try {
-        const roleDocRef = doc(db, "Roles", "こども");
+        const roleDocRef = doc(db, "Students");
         const roleDocSnapshot = await getDoc(roleDocRef);
 
         if (!roleDocSnapshot.exists()) {
@@ -240,12 +249,12 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
               <Label>評価セクション</Label>
               {(formData.ratings || []).map((rating, index) => (
                 <div key={index} className="flex items-center justify-between">
-                  <span>{rating.skill}</span>
+                  <span>{skills[index]}</span>
                   <StarRating
-                    value={rating.value}
+                    value={rating}
                     onChange={(value) => {
                       const updatedRatings = [...(formData.ratings || [])];
-                      updatedRatings[index].value = value;
+                      updatedRatings[index] = value;
                       setFormData({ ...formData, ratings: updatedRatings });
                     }}
                   />
