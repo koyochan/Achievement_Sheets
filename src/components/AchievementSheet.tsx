@@ -39,6 +39,7 @@ interface AchievementSheetProps {
   data: AchievementData;
 }
 
+
 const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
   if (!data) return <div className="text-black">データが見つかりません。</div>;
 
@@ -52,6 +53,11 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
     const minutes = duration % 60;
     return `${hours}時間${minutes}分`;
   };
+
+  const radarData = skills.map((skill, index) => ({
+    skill,
+    value: data.ratings[index],
+  }));
 
   return (
     <div className="container mx-auto p-6 space-y-8 bg-white min-h-screen">
@@ -132,7 +138,7 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
           <CardContent>
             <div className="w-full max-w-lg mx-auto">
               <ResponsiveContainer width="100%" height={400}>
-                <RadarChart data={data.ratings}>
+                <RadarChart data={radarData}>
                   <PolarGrid stroke="#e2e8f0" />
                   <PolarAngleAxis dataKey="skill" tick={{ fill: "#4a5568" }} />
                   <PolarRadiusAxis
