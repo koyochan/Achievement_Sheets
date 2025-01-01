@@ -49,8 +49,10 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
   };
 
   const formatDuration = (duration: number): string => {
+    console.log(duration);
     const hours = Math.floor(duration / 60);
     const minutes = duration % 60;
+    console.log(hours, minutes);
     return `${hours}時間${minutes}分`;
   };
 

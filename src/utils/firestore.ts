@@ -18,10 +18,11 @@ export const saveAchievementToFirestore = async (userId: string, data: Achieveme
     // 必要な情報をAchievementDataから取得
     const studentName = data.student_name; // AchievementDataから名前を取得
     const date = data.date; // AchievementDataから日付を取得
-    const duration = data.duration; // AchievementDataから稼働時間を取得
+    data.duration = data.end_time - data.start_time; // AchievementDataから稼働時間を取得
 
     // カスタムIDを生成
-    const customId = generateCustomId(studentName, date, String(duration));
+    const customId = generateCustomId(studentName, date, String(data.duration));
+    // 文字列から数値に変換
 
     // Firestoreの参照を作成
     const achievementRef = doc(collection(db, "Attendance"), customId);
