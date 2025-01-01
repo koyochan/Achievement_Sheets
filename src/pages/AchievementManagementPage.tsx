@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import AchievementSheet, { AchievementData } from "@/components/AchievementSheet";
 import AchievementForm from "@/components/AchievementForm";
-import { saveAchievementToFirestore } from "@/utils/firestore";
+import { SaveAttendaceCollections , SaveUserAttendanceField} from "@/utils/firestore";
 import { calculateXp } from "@/utils/CalculateXp";
 const AchievementManagementPage: React.FC = () => {
   const [submittedData, setSubmittedData] = useState<AchievementData | null>(null);
@@ -9,7 +9,7 @@ const AchievementManagementPage: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleFormSubmit = async (data: AchievementData) => {
-    const userId = "User123";
+    const userId = "displayName=%E6%9D%BE%E4%BA%95%20%E5%84%AA%E7%9F%A5Jr&furigana=%E3%81%BE%E3%81%A4%E3%81%84%20%E3%82%86%E3%81%86%E3%81%97%E3%81%98%E3%82%85%E3%81%AB%E3%81%82&birthday=19971012";
     console.log("フォーム送信データ:", data);
 
     try {
@@ -23,7 +23,8 @@ const AchievementManagementPage: React.FC = () => {
         xp_earned: xpEarned,
       };
 
-      await saveAchievementToFirestore(userId, dataWithXp);
+      // await SaveAttendaceCollections(userId, dataWithXp);
+      await SaveUserAttendanceField(userId, dataWithXp);
       
 
       setSubmittedData(dataWithXp);
