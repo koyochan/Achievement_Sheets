@@ -74,7 +74,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
       setLoading(true);
 
       try {
-        const roleDocRef = doc(db, "Role", "children");
+        const roleDocRef = doc(db, "Roles", "こども");
         const roleDocSnapshot = await getDoc(roleDocRef);
 
         if (!roleDocSnapshot.exists()) {
@@ -87,7 +87,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
         const data = roleDocSnapshot.data();
         const childIds = Array.isArray(data.id) ? data.id : [];
 
-        const userSnapshot = await getDocs(collection(db, "User"));
+        const userSnapshot = await getDocs(collection(db, "Users"));
         const matchedResults: Student[] = userSnapshot.docs
           .filter(
             (doc) =>
@@ -123,7 +123,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
       student_name: student.name,
       UUID: student.id, // UUID を設定
     });
-    setSearchTerm(""); // 検索欄をクリア
+    setSearchTerm("student.name"); // 検索欄をクリア
     setResults([]); // 検索結果をクリア
   };
 

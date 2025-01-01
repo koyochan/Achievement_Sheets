@@ -17,8 +17,8 @@ const generateRandomString = (length: number): string => {
 /**
  * 指定された形式のIDを生成
  */
-const generateCustomId = (random: string, name: string, date: string, duration: string): string => {
-  return `${random}?name=${name}&date=${date}&duration=${duration}`;
+const generateCustomId = (name: string, date: string, duration: string): string => {
+  return `displayname=${name}&date=${date}&duration=${duration}`;
 };
 
 
@@ -33,8 +33,7 @@ export const saveAchievementToFirestore = async (userId: string, data: Achieveme
     const duration = data.duration; // AchievementDataから稼働時間を取得
 
     // カスタムIDを生成
-    const randomString = generateRandomString(10);
-    const customId = generateCustomId(randomString, studentName, date, String(duration));
+    const customId = generateCustomId(studentName, date, String(duration));
 
     // Firestoreの参照を作成
     const achievementRef = doc(collection(db, "Attendance"), customId);
