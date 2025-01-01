@@ -14,7 +14,8 @@ import { SkipBack } from "lucide-react";
 
 interface Student {
   id: string;
-  name: string;
+  furigana: string;
+  displayName: string;
 }
 
 interface AchievementFormProps {
@@ -60,57 +61,49 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
       0,
     ],
     teacher_comment: "",
-    start_time: 0,
-    end_time: 0,
+    start_time: 540,
+    end_time: 540,
     UUID: "",
   });
 
-  useEffect(() => {
-    const fetchSuggestions = async () => {
-      if (!searchTerm) {
-        setResults([]);
-        return;
-      }
+useEffect(() => {
+  const fetchSuggestions = async () => {
+    if (!searchTerm.trim()) {
+      setResults([]);
+      return;
+    }
 
-      setLoading(true);
+    setLoading(true);
 
-      try {
-        const roleDocRef = doc(db, "Students");
-        const roleDocSnapshot = await getDoc(roleDocRef);
+    try {
+      const studentsSnapshot = await getDocs(collection(db, "Students"));
 
-        if (!roleDocSnapshot.exists()) {
-          console.warn("Roleコレクションのchildrenドキュメントが見つかりません。");
-          setResults([]);
-          setLoading(false);
-          return;
-        }
+      const matchedResults: Student[] = studentsSnapshot.docs
+        .filter((doc) => doc.id.includes(`furigana=${encodeURIComponent(searchTerm.trim())}`))
+        .map((doc) => {
+          const idParts = new URLSearchParams(doc.id);
 
-        const data = roleDocSnapshot.data();
-        const childIds = Array.isArray(data.id) ? data.id : [];
-
-        const userSnapshot = await getDocs(collection(db, "Users"));
-        const matchedResults: Student[] = userSnapshot.docs
-          .filter(
-            (doc) =>
-              childIds.includes(doc.id) &&
-              doc.data().name.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-          .map((doc) => ({
+          return {
             id: doc.id,
-            name: doc.data().name,
-          }));
+            displayName: decodeURIComponent(idParts.get("displayName") || ""),
+            furigana: decodeURIComponent(idParts.get("furigana") || ""),
+          };
+        });
 
-        setResults(matchedResults);
-      } catch (error) {
-        console.error("Firestore検索中にエラーが発生しました:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      console.log("検索結果:", matchedResults);
 
-    const timeoutId = setTimeout(fetchSuggestions, 300);
-    return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
+      setResults(matchedResults);
+    } catch (error) {
+      console.error("Firestore検索中にエラーが発生しました:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const timeoutId = setTimeout(fetchSuggestions, 300);
+  return () => clearTimeout(timeoutId);
+}, [searchTerm]);
+
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
@@ -121,10 +114,11 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
     setSelectedStudent(student); // 選択された生徒を保存
     setFormData({
       ...formData,
-      student_name: student.name,
+      student_name: student.displayName,
       UUID: student.id, // UUID を設定
     });
-    setSearchTerm("student.name"); // 検索欄をクリア
+ 
+    setSearchTerm(student.displayName); // 検索欄をクリア
     setResults([]); // 検索結果をクリア
   };
 
@@ -165,7 +159,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
                     onClick={() => handleStudentSelect(student)}
                     className="p-2 cursor-pointer hover:bg-gray-200"
                   >
-                    {student.name}
+                    {student.displayName}
                   </li>
                 ))}
                 {!loading && results.length === 0 && searchTerm && (
@@ -177,7 +171,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
             {/* 選択された生徒名を表示 */}
             {selectedStudent && (
               <div className="p-4 border rounded bg-gray-50">
-                <p>生徒名: <strong>{selectedStudent.name}</strong></p>
+                <p>生徒名: <strong>{selectedStudent.displayName}</strong></p>
               </div>
             )}
 

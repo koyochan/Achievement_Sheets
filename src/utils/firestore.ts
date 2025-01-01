@@ -6,7 +6,7 @@ import { db } from "./firebase"; // Firebase 初期化ファイル
  * 指定された形式のIDを生成
  */
 const generateCustomId = (name: string, date: string, duration: string): string => {
-  return `displayname=${name}&date=${date}&duration=${duration}`;
+  return `displayname=${encodeURIComponent(name)}&date=${date}&duration=${duration}`;
 };
 
 

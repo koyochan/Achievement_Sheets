@@ -17,6 +17,7 @@ const AchievementManagementPage: React.FC = () => {
       setErrorMessage(null);
 
       const xpEarned = calculateXp(data.progress_percentage, data.ratings);
+      // XPをStudentに追加
       const dataWithXp = {
         ...data,
         xp_earned: xpEarned,
