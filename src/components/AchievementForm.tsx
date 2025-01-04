@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "./StartRating";
 import { ProgressInput } from "./ProgressInput";
-import { DatePicker } from "./DataPicker";
+import { DatePicker } from "./form/DataPicker";
 import { SkipBack } from "lucide-react";
 import { StudentSearch } from "./form/StudentSearch";
 
@@ -160,15 +160,12 @@ useEffect(() => {
                 onChange={handleChange}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="date">日付</Label>
-              <DatePicker
-                id="date"
-                name="date"
-                value={formData.date || ""}
-                onChange={(value) => setFormData({ ...formData, date: value })}
-              />
-            </div>
+            <DatePicker
+              id="date"
+              name="date"
+              value={formData.date || ""}
+              onChange={(value) => setFormData({ ...formData, date: value })}
+            />
             <div className="space-y-2">
               <Label htmlFor="activity">活動内容</Label>
               <Input
