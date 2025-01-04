@@ -11,6 +11,7 @@ import { StarRating } from "./StartRating";
 import { ProgressInput } from "./ProgressInput";
 import { DatePicker } from "./DataPicker";
 import { SkipBack } from "lucide-react";
+import { StudentSearch } from "./form/StudentSearch";
 
 interface Student {
   id: string;
@@ -140,38 +141,14 @@ useEffect(() => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             {/* 生徒検索 */}
-            <div className="space-y-2">
-              <Label htmlFor="searchTerm">生徒名で検索</Label>
-              <Input
-                id="searchTerm"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="名前を入力してください"
-                autoComplete="off"
-              />
-              <ul className="border rounded mt-2 bg-white max-h-40 overflow-y-auto">
-                {loading && <li className="p-2 text-gray-500">検索中...</li>}
-                {results.map((student) => (
-                  <li
-                    key={student.id}
-                    onClick={() => handleStudentSelect(student)}
-                    className="p-2 cursor-pointer hover:bg-gray-200"
-                  >
-                    {student.displayName}
-                  </li>
-                ))}
-                {!loading && results.length === 0 && searchTerm && (
-                  <li className="p-2 text-gray-500">一致する生徒が見つかりませんでした。</li>
-                )}
-              </ul>
-            </div>
 
-            {/* 選択された生徒名を表示 */}
-            {selectedStudent && (
-              <div className="p-4 border rounded bg-gray-50">
-                <p>生徒名: <strong>{selectedStudent.displayName}</strong></p>
-              </div>
-            )}
+            <StudentSearch
+            searchTerm={searchTerm}
+            results={results}
+            loading={loading}
+            onSearchChange={setSearchTerm}
+            onSelectStudent={handleStudentSelect}
+            />
 
             {/* 他のフィールド */}
             <div className="space-y-2">
