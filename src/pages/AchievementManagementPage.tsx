@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import AchievementSheet, { AchievementData } from "@/components/AchievementSheet";
 import AchievementForm from "@/components/AchievementForm";
-import { SaveAttendaceCollections , SaveUserAttendanceField} from "@/utils/firestore";
+import {SaveUserAttendanceField} from "@/utils/firestore";
 import { calculateXp } from "@/utils/CalculateXp";
 const AchievementManagementPage: React.FC = () => {
   const [submittedData, setSubmittedData] = useState<AchievementData | null>(null);
@@ -23,7 +23,6 @@ const AchievementManagementPage: React.FC = () => {
         xp_earned: xpEarned,
       };
 
-      // await SaveAttendaceCollections(userId, dataWithXp);
       await SaveUserAttendanceField(userId, dataWithXp);
       
 

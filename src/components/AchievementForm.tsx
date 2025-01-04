@@ -63,7 +63,6 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
     teacher_comment: "",
     start_time: 540,
     end_time: 540,
-    UUID: "",
   });
 
 useEffect(() => {
@@ -115,7 +114,6 @@ useEffect(() => {
     setFormData({
       ...formData,
       student_name: student.displayName,
-      UUID: student.id, // UUID を設定
     });
  
     setSearchTerm(student.displayName); // 検索欄をクリア

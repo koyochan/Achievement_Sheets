@@ -24,14 +24,7 @@ export const SaveUserAttendanceField = async (userId: string, data: AchievementD
 
     // FirestoreにAttendanceデータを保存
     await setDoc(achievementRef, {
-      userId,
       ...data, // AchievementData のすべてのプロパティを展開
-    });
-
-    console.log("Attendanceデータが保存されました:", {
-      id: attendanceID,
-      userId,
-      data,
     });
 
     // studentsコレクションのUUIDドキュメントを更新
