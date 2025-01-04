@@ -14,7 +14,6 @@ export const SaveUserAttendanceField = async (userId: string, data: AchievementD
     // 必要な情報をAchievementDataから取得
     const studentName = data.student_name;
     const date = data.date;
-    data.duration = data.end_time - data.start_time;
 
     // カスタムIDを生成
     const attendanceID = generateCustomId(studentName, date, String(data.duration));

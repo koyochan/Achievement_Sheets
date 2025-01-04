@@ -127,7 +127,7 @@ useEffect(() => {
       alert("終了時間は開始時間より後である必要があります。");
       return;
     }
-
+    
     onSubmit(formData as AchievementData);
   };
 
