@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
-import { AchievementData } from "./AchievementSheet";
+import { AchievementData, skills} from "./AchievementSheet";
 import { db } from "../utils/firebase"; // Firebaseの初期化ファイル
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,11 +9,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { StarRating } from "./StartRating";
 import { ProgressInput } from "./ProgressInput";
-import { DatePicker } from "./DataPicker";
+import { DatePicker } from "./form/DataPicker";
+import { SkipBack } from "lucide-react";
+import { StudentSearch } from "./form/StudentSearch";
 
 interface Student {
   id: string;
-  name: string;
+  furigana: string;
+  displayName: string;
 }
 
 interface AchievementFormProps {
@@ -52,64 +55,55 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
     progress: "",
     progress_percentage: 0,
     ratings: [
-      { skill: "集中力", value: 0 },
-      { skill: "創造性", value: 0 },
-      { skill: "習得度", value: 0 },
-      { skill: "コミュニケーション能力", value: 0 },
-      { skill: "問題解決能力", value: 0 },
+      0,
+      0,
+      0,
+      0,
+      0,
     ],
     teacher_comment: "",
-    start_time: 0,
-    end_time: 0,
-    UUID: "",
+    start_time: 540,
+    end_time: 540,
   });
 
-  useEffect(() => {
-    const fetchSuggestions = async () => {
-      if (!searchTerm) {
-        setResults([]);
-        return;
-      }
+useEffect(() => {
+  const fetchSuggestions = async () => {
+    if (!searchTerm.trim()) {
+      setResults([]);
+      return;
+    }
 
-      setLoading(true);
+    setLoading(true);
 
-      try {
-        const roleDocRef = doc(db, "Role", "children");
-        const roleDocSnapshot = await getDoc(roleDocRef);
+    try {
+      const studentsSnapshot = await getDocs(collection(db, "Students"));
 
-        if (!roleDocSnapshot.exists()) {
-          console.warn("Roleコレクションのchildrenドキュメントが見つかりません。");
-          setResults([]);
-          setLoading(false);
-          return;
-        }
+      const matchedResults: Student[] = studentsSnapshot.docs
+        .filter((doc) => doc.id.includes(`furigana=${encodeURIComponent(searchTerm.trim())}`))
+        .map((doc) => {
+          const idParts = new URLSearchParams(doc.id);
 
-        const data = roleDocSnapshot.data();
-        const childIds = Array.isArray(data.id) ? data.id : [];
-
-        const userSnapshot = await getDocs(collection(db, "User"));
-        const matchedResults: Student[] = userSnapshot.docs
-          .filter(
-            (doc) =>
-              childIds.includes(doc.id) &&
-              doc.data().name.toLowerCase().includes(searchTerm.toLowerCase())
-          )
-          .map((doc) => ({
+          return {
             id: doc.id,
-            name: doc.data().name,
-          }));
+            displayName: decodeURIComponent(idParts.get("displayName") || ""),
+            furigana: decodeURIComponent(idParts.get("furigana") || ""),
+          };
+        });
 
-        setResults(matchedResults);
-      } catch (error) {
-        console.error("Firestore検索中にエラーが発生しました:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+      console.log("検索結果:", matchedResults);
 
-    const timeoutId = setTimeout(fetchSuggestions, 300);
-    return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
+      setResults(matchedResults);
+    } catch (error) {
+      console.error("Firestore検索中にエラーが発生しました:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const timeoutId = setTimeout(fetchSuggestions, 300);
+  return () => clearTimeout(timeoutId);
+}, [searchTerm]);
+
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = event.target;
@@ -120,10 +114,10 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
     setSelectedStudent(student); // 選択された生徒を保存
     setFormData({
       ...formData,
-      student_name: student.name,
-      UUID: student.id, // UUID を設定
+      student_name: student.displayName,
     });
-    setSearchTerm(""); // 検索欄をクリア
+ 
+    setSearchTerm(student.displayName); // 検索欄をクリア
     setResults([]); // 検索結果をクリア
   };
 
@@ -134,7 +128,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
       alert("終了時間は開始時間より後である必要があります。");
       return;
     }
-
+    
     onSubmit(formData as AchievementData);
   };
 
@@ -147,38 +141,14 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             {/* 生徒検索 */}
-            <div className="space-y-2">
-              <Label htmlFor="searchTerm">生徒名で検索</Label>
-              <Input
-                id="searchTerm"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="名前を入力してください"
-                autoComplete="off"
-              />
-              <ul className="border rounded mt-2 bg-white max-h-40 overflow-y-auto">
-                {loading && <li className="p-2 text-gray-500">検索中...</li>}
-                {results.map((student) => (
-                  <li
-                    key={student.id}
-                    onClick={() => handleStudentSelect(student)}
-                    className="p-2 cursor-pointer hover:bg-gray-200"
-                  >
-                    {student.name}
-                  </li>
-                ))}
-                {!loading && results.length === 0 && searchTerm && (
-                  <li className="p-2 text-gray-500">一致する生徒が見つかりませんでした。</li>
-                )}
-              </ul>
-            </div>
 
-            {/* 選択された生徒名を表示 */}
-            {selectedStudent && (
-              <div className="p-4 border rounded bg-gray-50">
-                <p>生徒名: <strong>{selectedStudent.name}</strong></p>
-              </div>
-            )}
+            <StudentSearch
+            searchTerm={searchTerm}
+            results={results}
+            loading={loading}
+            onSearchChange={setSearchTerm}
+            onSelectStudent={handleStudentSelect}
+            />
 
             {/* 他のフィールド */}
             <div className="space-y-2">
@@ -190,15 +160,12 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
                 onChange={handleChange}
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="date">日付</Label>
-              <DatePicker
-                id="date"
-                name="date"
-                value={formData.date || ""}
-                onChange={(value) => setFormData({ ...formData, date: value })}
-              />
-            </div>
+            <DatePicker
+              id="date"
+              name="date"
+              value={formData.date || ""}
+              onChange={(value) => setFormData({ ...formData, date: value })}
+            />
             <div className="space-y-2">
               <Label htmlFor="activity">活動内容</Label>
               <Input
@@ -240,12 +207,12 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
               <Label>評価セクション</Label>
               {(formData.ratings || []).map((rating, index) => (
                 <div key={index} className="flex items-center justify-between">
-                  <span>{rating.skill}</span>
+                  <span>{skills[index]}</span>
                   <StarRating
-                    value={rating.value}
+                    value={rating}
                     onChange={(value) => {
                       const updatedRatings = [...(formData.ratings || [])];
-                      updatedRatings[index].value = value;
+                      updatedRatings[index] = value;
                       setFormData({ ...formData, ratings: updatedRatings });
                     }}
                   />

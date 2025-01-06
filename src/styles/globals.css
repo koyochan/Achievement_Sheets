@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+.card-base {
+  @apply bg-white border border-gray-200 shadow-md rounded-lg p-4;
+}
+
+.card-title {
+  @apply text-2xl font-bold text-black;
+}
+
+.progress-bar {
+  @apply bg-gray-200 rounded h-4 overflow-hidden;
+}
+
+.progress-bar-inner {
+  @apply bg-blue-600 h-full;
+}
