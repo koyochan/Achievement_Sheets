@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { AchievementData, skills} from "@/type";
+import {  getInitialFormData, } from  "@/utils/GetInitAchievementData"
 import { db } from "@/utils/firebase"; // Firebaseの初期化ファイル
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,7 +13,6 @@ import { ProgressInput } from "./ProgressInput";
 import { DatePicker } from "./form/DataPicker";
 import { SkipBack } from "lucide-react";
 import { StudentSearch, Student } from "./form/StudentSearch";
-import { getInitialFormData } from "@/utils/getInitialFormData";
 
 interface AchievementFormProps {
   onSubmit: (AchievementData: AchievementData, studentID: string) => void; // 必須: フォーム送信時のコールバック

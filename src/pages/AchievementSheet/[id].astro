@@ -1,0 +1,25 @@
+---
+const { id } = Astro.params;
+
+// ページごとのデータを取得
+const response = await fetch(`api/achievements/${id}`);
+
+// 200以外のステータスコードの場合はエラーをスロー
+if (!response.ok) {
+  // Astroの標準的なエラー処理
+  throw new Error(`Achievement with ID "${id}" not found.`);
+}
+
+// 成功した場合はデータをJSONとしてパース
+const achievement = await response.json();
+---
+
+<html>
+  <head>
+    <title>Achievement: {achievement.title}</title>
+  </head>
+  <body>
+    <h1>{achievement.title}</h1>
+    <p>{achievement.description}</p>
+  </body>
+</html>
