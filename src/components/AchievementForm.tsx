@@ -14,13 +14,13 @@ import { SkipBack } from "lucide-react";
 import { StudentSearch } from "./form/StudentSearch";
 
 interface Student {
-  id: string;
+  userid: string;
   furigana: string;
   displayName: string;
 }
 
 interface AchievementFormProps {
-  onSubmit: (data: AchievementData) => void; // 必須: フォーム送信時のコールバック
+  onSubmit: (AchievementData: AchievementData, studentID: string) => void; // 必須: フォーム送信時のコールバック
 }
 
 const generateTimeOptions = () => {
@@ -63,7 +63,8 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
     ],
     teacher_comment: "",
     start_time: 540,
-    end_time: 540,
+    end_time: 555,
+    duration: 0
   });
 
 useEffect(() => {
@@ -84,7 +85,7 @@ useEffect(() => {
           const idParts = new URLSearchParams(doc.id);
 
           return {
-            id: doc.id,
+            userid: doc.id,
             displayName: decodeURIComponent(idParts.get("displayName") || ""),
             furigana: decodeURIComponent(idParts.get("furigana") || ""),
           };
@@ -122,15 +123,36 @@ useEffect(() => {
   };
 
   const handleSubmit = (event: React.FormEvent) => {
-    event.preventDefault();
+  event.preventDefault();
 
-    if (!formData.start_time || !formData.end_time || formData.start_time >= formData.end_time) {
-      alert("終了時間は開始時間より後である必要があります。");
-      return;
-    }
-    
-    onSubmit(formData as AchievementData);
+  // 生徒が選択されていない場合のエラーチェック
+  if (!selectedStudent) {
+    alert("生徒を選択してください。");
+    return;
+  }
+
+  if (!formData.start_time || !formData.end_time || formData.start_time >= formData.end_time) {
+    alert("終了時間は開始時間より後である必要があります。");
+    return;
+  }
+
+  // 所要時間を計算
+  const duration = formData.end_time - formData.start_time;
+
+  // 日付をフォーマット
+  const formattedDate = formData.date?.replace(/-/g, "") || "";
+
+  // AchievementDataを作成
+  const achievementData: AchievementData = {
+    ...(formData as AchievementData),
+    duration: duration,
+    date: formattedDate,
+    student_name: selectedStudent.displayName, // 選択された生徒名
   };
+
+  // onSubmitにデータと生徒IDを渡す
+  onSubmit(achievementData, selectedStudent.userid);
+};
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -150,15 +172,6 @@ useEffect(() => {
             onSelectStudent={handleStudentSelect}
             />
 
-            {/* 他のフィールド */}
-            <div className="space-y-2">
-              <Label htmlFor="teacher">担当教師</Label>
-              <Input
-                id="teacher"
-                name="teacher"
-                value={formData.teacher || ""}
-                onChange={handleChange}
-              />
             </div>
             <DatePicker
               id="date"
@@ -167,6 +180,14 @@ useEffect(() => {
               onChange={(value) => setFormData({ ...formData, date: value })}
             />
             <div className="space-y-2">
+            {/* <div className="space-y-2">
+              <Label htmlFor="teacher">担当教師</Label>
+              <Input
+                id="teacher"
+                name="teacher"
+                value={formData.teacher || ""}
+                onChange={handleChange}
+              />
               <Label htmlFor="activity">活動内容</Label>
               <Input
                 id="activity"
@@ -228,7 +249,7 @@ useEffect(() => {
                 onChange={handleChange}
                 required
               />
-            </div>
+            </div> */}
             <div className="space-y-2">
               <Label htmlFor="start_time">開始時間</Label>
               <select

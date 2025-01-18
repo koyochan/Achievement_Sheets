@@ -19,6 +19,8 @@ export const skills: string[] = [
 ];
 
 export interface AchievementData {
+  created_at: Date;
+  updated_at: Date;
   student_name: string;
   date: string;
   teacher: string;

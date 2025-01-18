@@ -1,4 +1,4 @@
-import { doc, collection, setDoc, updateDoc, arrayUnion, runTransaction } from "firebase/firestore";
+import { doc, collection, setDoc, updateDoc, arrayUnion, runTransaction , serverTimestamp} from "firebase/firestore";
 import { AchievementData } from "@/components/AchievementSheet";
 import { db } from "./firebase"; // Firebase 初期化ファイル
 
@@ -6,7 +6,7 @@ import { db } from "./firebase"; // Firebase 初期化ファイル
  * 指定された形式のIDを生成
  */
 const generateCustomId = (name: string, date: string, duration: string): string => {
-  return `displayname=${encodeURIComponent(name)}&date=${date}&duration=${duration}`;
+  return `displayName=${encodeURIComponent(name)}&date=${date}&duration=${duration}`;
 };
 
 export const SaveUserAttendanceField = async (userId: string, data: AchievementData) => {
@@ -19,7 +19,7 @@ export const SaveUserAttendanceField = async (userId: string, data: AchievementD
     const attendanceID = generateCustomId(studentName, date, String(data.duration));
 
     // Attendanceコレクションへの参照を作成
-    const achievementRef = doc(collection(db, "Attendance"), attendanceID);
+    const achievementRef = doc(collection(db, "TestAttendances"), attendanceID);
 
     // FirestoreにAttendanceデータを保存
     await setDoc(achievementRef, {
@@ -40,7 +40,9 @@ export const SaveUserAttendanceField = async (userId: string, data: AchievementD
       // attendance配列に新しいattendanceIDを追加
       transaction.update(studentRef, {
         attendances: arrayUnion(attendanceID), // 配列にユニークに追加
+        updated_at: serverTimestamp(),
       });
+
     });
 
     console.log("学生のattendance配列が更新されました:", attendanceID);

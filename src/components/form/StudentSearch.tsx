@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface Student {
-  id: string;
+  userid: string;
   furigana: string; // furigana を追加
   displayName: string;
 }
@@ -50,7 +50,7 @@ export const StudentSearch: React.FC<StudentSearchProps> = ({
           {!loading && results.length > 0 && (
             <ul className="divide-y divide-gray-200">
               {results.map((student) => (
-                <li key={student.id}>
+                <li key={student.userid}>
                   <button
                     onClick={() => handleStudentSelect(student)}
                     className="w-full text-left p-2 hover:bg-gray-100 focus:outline-none focus:bg-gray-200"
