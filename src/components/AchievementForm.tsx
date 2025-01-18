@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
-import { AchievementData, skills} from "./AchievementSheet";
-import { db } from "../utils/firebase"; // Firebaseの初期化ファイル
+import { AchievementData, skills} from "@/type";
+import { db } from "@/utils/firebase"; // Firebaseの初期化ファイル
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,29 +11,28 @@ import { StarRating } from "./StartRating";
 import { ProgressInput } from "./ProgressInput";
 import { DatePicker } from "./form/DataPicker";
 import { SkipBack } from "lucide-react";
-import { StudentSearch } from "./form/StudentSearch";
-
-interface Student {
-  userid: string;
-  furigana: string;
-  displayName: string;
-}
+import { StudentSearch, Student } from "./form/StudentSearch";
+import { getInitialFormData } from "@/utils/getInitialFormData";
 
 interface AchievementFormProps {
   onSubmit: (AchievementData: AchievementData, studentID: string) => void; // 必須: フォーム送信時のコールバック
 }
 
-const generateTimeOptions = () => {
-  const options = [];
+// タイムスタンプを15分ごとに9時 ~ 19時(営業時間)まで生成
+
+const generateTimeStamp = () => {
+  const timestamp = [];
   for (let hour = 9; hour < 19; hour++) {
     for (let minute = 0; minute < 60; minute += 15) {
-      options.push(hour * 60 + minute); // 分単位で時間を管理
+      timestamp.push(hour * 60 + minute); // 分単位で時間を管理
     }
   }
-  return options;
+  return timestamp;
 };
 
-const timeOptions = generateTimeOptions();
+const timestamp = generateTimeStamp();
+
+// padstartメソッド(桁を揃えるにあたって文字列の先頭に任意の文字を追加する)　例: 5 -> 05
 
 const numberToTimeString = (minutes: number): string => {
   const hours = Math.floor(minutes / 60).toString().padStart(2, "0");
@@ -46,26 +45,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
   const [results, setResults] = useState<Student[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null); // 選択された生徒を保持する状態
-  const [formData, setFormData] = useState<Partial<AchievementData>>({
-    student_name: "",
-    date: "",
-    teacher: "",
-    activity: "",
-    goal: "",
-    progress: "",
-    progress_percentage: 0,
-    ratings: [
-      0,
-      0,
-      0,
-      0,
-      0,
-    ],
-    teacher_comment: "",
-    start_time: 540,
-    end_time: 555,
-    duration: 0
-  });
+  const [formData, setFormData] = useState<Partial<AchievementData>>(getInitialFormData());
 
 useEffect(() => {
   const fetchSuggestions = async () => {
@@ -261,7 +241,7 @@ useEffect(() => {
                 }
                 className="w-full border p-2 rounded"
               >
-                {timeOptions.map((minutes) => (
+                {timestamp.map((minutes) => (
                   <option key={minutes} value={minutes}>
                     {numberToTimeString(minutes)}
                   </option>
@@ -279,7 +259,7 @@ useEffect(() => {
                 }
                 className="w-full border p-2 rounded"
               >
-                {timeOptions
+                {timestamp
                   .filter((minutes) => minutes > (formData.start_time || 0))
                   .map((minutes) => (
                     <option key={minutes} value={minutes}>

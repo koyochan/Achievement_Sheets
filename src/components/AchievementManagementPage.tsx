@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import AchievementSheet, { AchievementData } from "@/components/AchievementSheet";
+import AchievementSheet from "@/components/AchievementSheet";
+import { AchievementData } from "@/type";
 import AchievementForm from "@/components/AchievementForm";
 import {SaveUserAttendanceField} from "@/utils/firestore";
 import { calculateXp } from "@/utils/CalculateXp";
@@ -9,7 +10,6 @@ const AchievementManagementPage: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 
-  // ハードコードされているUserIDをStudent Searchで選択したIDを使用するように変更する
   const handleFormSubmit = async (AchievementData: AchievementData, userId: string) => {
     console.log("フォーム送信データ:", AchievementData);
 

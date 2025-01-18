@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-interface Student {
+export interface Student {
   userid: string;
   furigana: string; // furigana を追加
   displayName: string;
