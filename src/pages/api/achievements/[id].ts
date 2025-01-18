@@ -1,7 +1,7 @@
 // src/pages/api/achievements/[id].ts
 import type { APIRoute } from 'astro';
 
-export const get: APIRoute = async ({ params }) => {
+export const GET: APIRoute = async ({ params }) => {
   const id: string | undefined = params.id;
 
   // `id` が undefined の場合にエラーを防ぐためのチェック
@@ -20,7 +20,7 @@ export const get: APIRoute = async ({ params }) => {
   };
 
   // データ取得
-  const achievement = achievements[id];
+  const achievement = achievements[id as keyof typeof achievements];
 
   // レスポンス生成
   if (achievement) {

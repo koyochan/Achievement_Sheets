@@ -1,12 +1,13 @@
 ---
+export const prerender = false; // これでSSRを有効化
+
 const { id } = Astro.params;
 
 // ページごとのデータを取得
-const response = await fetch(`api/achievements/${id}`);
+const response = await fetch(`http://localhost:4321/api/achievements/${id}`);
 
-// 200以外のステータスコードの場合はエラーをスロー
+// エラーハンドリング
 if (!response.ok) {
-  // Astroの標準的なエラー処理
   throw new Error(`Achievement with ID "${id}" not found.`);
 }
 
