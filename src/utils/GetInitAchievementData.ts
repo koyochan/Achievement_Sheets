@@ -1,4 +1,4 @@
-import { AchievementData } from "@/type/type";
+import { AchievementData } from "@/type";
 
 export const getInitialFormData = (): Partial<AchievementData> => ({
   created_at: new Date(),

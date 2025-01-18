@@ -8,8 +8,12 @@ interface AchievementSheetProps {
 }
 
 
-const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
+export const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
   if (!data) return <div className="text-black">データが見つかりません。</div>;
+
+  console.log("Achievement Data:", data); // 全体のデータを確認
+console.log("Duration:", data.duration); // Durationを確認
+console.log("Ratings:", data.ratings); // Ratingsを確認
 
   const fadeIn = {
     hidden: { opacity: 0, y: 20 },
@@ -17,7 +21,10 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
   };
 
   const formatDuration = (duration: number): string => {
-    console.log(duration);
+    if (duration === undefined || duration === null || isNaN(duration)) {
+    console.warn("Invalid duration:", duration); // デバッグ用
+    return "不明"; // 無効な場合は "不明" を返す
+  }
     const hours = Math.floor(duration / 60);
     const minutes = duration % 60;
     console.log(hours, minutes);
@@ -25,9 +32,9 @@ const AchievementSheet: React.FC<AchievementSheetProps> = ({ data }) => {
   };
 
   const radarData = skills.map((skill, index) => ({
-    skill,
-    value: data.ratings[index],
-  }));
+  skill,
+  value: Array.isArray(data.ratings) && index < data.ratings.length ? data.ratings[index] : 0,
+}));
 
   return (
     <div className="container mx-auto p-6 space-y-8 bg-white min-h-screen">

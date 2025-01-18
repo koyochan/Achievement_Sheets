@@ -1,4 +1,6 @@
 ---
+import { AchievementSheet } from "../../components/AchievementSheet";
+
 export const prerender = false; // これでSSRを有効化
 
 const { id } = Astro.params;
@@ -13,14 +15,19 @@ if (!response.ok) {
 
 // 成功した場合はデータをJSONとしてパース
 const achievement = await response.json();
+
+// コンソールにJSON形式で表示
+console.log("Achievement Data:", JSON.stringify(achievement, null, 2));
 ---
 
 <html>
   <head>
-    <title>Achievement: {achievement.title}</title>
+    <title>Achievement: {achievement.student_name}</title>
   </head>
   <body>
-    <h1>{achievement.title}</h1>
-    <p>{achievement.description}</p>
+    <div id="app">
+      <!-- Reactコンポーネントをここに挿入 -->
+      <AchievementSheet data={achievement.data} />
+    </div>
   </body>
 </html>
