@@ -59,6 +59,8 @@ useEffect(() => {
     try {
       const studentsSnapshot = await getDocs(collection(db, "Students"));
 
+      console.log("生徒データ:", studentsSnapshot.docs);
+
       const matchedResults: Student[] = studentsSnapshot.docs
         .filter((doc) => doc.id.includes(`furigana=${encodeURIComponent(searchTerm.trim())}`))
         .map((doc) => {

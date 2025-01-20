@@ -1,5 +1,5 @@
 import { doc, collection, setDoc, updateDoc, arrayUnion, runTransaction , serverTimestamp} from "firebase/firestore";
-import { AchievementData } from "@/type/type";
+import { AchievementData } from "@/type";
 import { db } from "./firebase"; // Firebase 初期化ファイル
 
 /**
@@ -26,7 +26,6 @@ export const SaveUserAttendanceField = async (userId: string, data: AchievementD
       ...data, // AchievementData のすべてのプロパティを展開
     });
 
-    // studentsコレクションのUUIDドキュメントを更新
     const studentRef = doc(db, "Students", userId);
 
     // トランザクションでattendanceフィールドを更新
@@ -42,6 +41,8 @@ export const SaveUserAttendanceField = async (userId: string, data: AchievementD
         attendances: arrayUnion(attendanceID), // 配列にユニークに追加
         updated_at: serverTimestamp(),
       });
+
+      
 
     });
 
