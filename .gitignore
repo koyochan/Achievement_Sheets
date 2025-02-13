@@ -5,6 +5,7 @@ dist/
 
 # firebase
 
+10Xer-service-account-file.json
 src/utils/firebase.ts
 
 # generated types

@@ -6,7 +6,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "start:emulator": "firebase emulators:start"
   },
   "dependencies": {
     "@astrojs/react": "^4.1.0",

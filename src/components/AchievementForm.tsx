@@ -2,16 +2,11 @@ import React, { useState, useEffect } from "react";
 import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { AchievementData, skills} from "@/type";
 import {  getInitialFormData, } from  "@/utils/GetInitAchievementData"
-import { db } from "@/utils/firebase"; // Firebaseの初期化ファイル
+import { db } from "@/utils/firebase"; 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { StarRating } from "./StartRating";
-import { ProgressInput } from "./ProgressInput";
 import { DatePicker } from "./form/DataPicker";
-import { SkipBack } from "lucide-react";
 import { StudentSearch, Student } from "./form/StudentSearch";
 
 interface AchievementFormProps {

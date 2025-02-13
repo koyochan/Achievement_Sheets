@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  firebase:
+    build: .
+    ports:
+      - "4000:4000"
+      - "8080:8080"
+      - "9099:9099"
+      - "9000:9000"
+      - "8085:8085"
+    volumes:
+      - ./firestore-backup:/firestore-backup
+    env_file:
+      - .env
+    command: >
+      npx firebase emulators:start --only firestore,auth --import=/firestore-backup
