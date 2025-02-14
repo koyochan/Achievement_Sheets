@@ -1,8 +1,41 @@
 ---
-import AchievementManagementPage from "@/components/AchievementManagementPage";
-import Layout from "@/layouts/Layout.astro";
+import { db } from "@/lib/firebase"; // Firestore インスタンスを取得
+
+let attendanceRecords = [];
+let errorMessage = "";
+
+try {
+  // Firestore の Attendance コレクションを取得
+  const snapshot = await db.collection("Attendances").get();
+
+  // もしデータがない場合のチェック
+  if (snapshot.empty) {
+    errorMessage = "⚠️ No attendance records found in Firestore.";
+    console.warn(errorMessage);
+  } else {
+    attendanceRecords = snapshot.docs.map(doc => ({
+      id: doc.id, // ドキュメント ID を取得
+      ...doc.data(),
+    }));
+  }
+} catch (error) {
+  errorMessage = `❌ Firestore Error: ${error.message}`;
+  console.error(errorMessage);
+}
 ---
 
-<Layout title="Achievement Management" description="Manage student achievements">
-  <AchievementManagementPage client:load />
-</Layout>
+<h2>Attendance Records</h2>
+
+{errorMessage ? (
+  <p style="color: red;">{errorMessage}</p>
+) : (
+  <ul>
+    {attendanceRecords.map((record) => (
+      <li key={record.id}>
+        <strong>ID:</strong> {record.id} <br />
+        <strong>Name:</strong> {record.name || "No Name"} <br />
+        <strong>Status:</strong> {record.status || "Unknown"}
+      </li>
+    ))}
+  </ul>
+)}

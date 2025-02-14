@@ -5,12 +5,18 @@
 
 # volume
 
-firestore-backup
+firestore-backup/
 
 # build output
 dist/
 
 .vscode/
+
+# log
+
+firestore-debug.log
+firestore.rules
+database-debug.log
 
 # firebase
 
