@@ -1,15 +1,10 @@
-import { db } from "@/lib/firebase"; // Firestore インスタンス
+import { db } from "@/lib/firebase-admin"; // Firestore インスタンス
 import type { APIRoute } from "astro";
 
 export const GET: APIRoute = async ({ url }) => {
   let searchTerm = url.searchParams.get("searchTerm") || "";
-
-  // デバッグ: 受け取った `searchTerm` の値を表示
-  console.log(`[DEBUG] Original searchTerm:`, searchTerm);
-
   // `decodeURIComponent()` でデコード
   searchTerm = decodeURIComponent(searchTerm);
-  console.log(`[DEBUG] Decoded searchTerm:`, searchTerm);
 
   if (!searchTerm.trim()) {
     return new Response(JSON.stringify({ students: [] }), { status: 200 });

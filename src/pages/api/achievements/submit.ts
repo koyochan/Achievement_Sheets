@@ -1,5 +1,5 @@
 import type { APIRoute } from "astro";
-import { db } from "@/lib/firebase"; // ✅ Firestore 初期化ファイル（firebase-adminを使用）
+import { db } from "@/lib/firebase-admin"; // ✅ Firestore 初期化ファイル（firebase-adminを使用）
 import { AchievementData } from "@/type";
 import admin from "firebase-admin"; // ✅ FirestoreのFieldValueを使うために追加
 

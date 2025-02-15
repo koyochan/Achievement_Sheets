@@ -12,7 +12,7 @@ const AchievementForm: React.FC = () => {
   const [results, setResults] = useState<Student[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-  const [formData, setFormData] = useState<Partial<AchievementData>>({ duration: 0 });
+  const [formData, setFormData] = useState<Partial<AchievementData>>({ duration: 0 }); 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -42,8 +42,8 @@ const AchievementForm: React.FC = () => {
     return () => clearTimeout(timeoutId);
   }, [searchTerm, selectedStudent]);
 
-  // [3] フォーム入力変更時の処理
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  // [3] フォーム入力変更
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -52,17 +52,17 @@ const AchievementForm: React.FC = () => {
   const handleStudentSelect = (student: Student) => {
     setSelectedStudent(student);
     setFormData((prev) => ({ ...prev, student_name: student.displayName }));
-    setSearchTerm(student.displayName); // 検索欄を生徒名にする
+    setSearchTerm(student.displayName);
   };
 
-  // [5] 選択を解除する
+  // [5] 選択を解除
   const handleClearStudent = () => {
     setSelectedStudent(null);
     setFormData((prev) => ({ ...prev, student_name: "" }));
     setSearchTerm("");
   };
 
-  // [6] フォーム送信時の処理
+  // [6] フォーム送信
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setIsSubmitting(true);
@@ -75,18 +75,18 @@ const AchievementForm: React.FC = () => {
       return;
     }
 
-    // `duration` のバリデーション
+    // `duration` のバリデーション (15分単位)
     const duration = Number(formData.duration);
-    if (!duration || duration <= 0) {
-      setErrorMessage("有効な学習時間 (分) を入力してください。");
+    if (!duration || duration < 15) {
+      setErrorMessage("有効な学習時間 (15分単位) を選択してください。");
       setIsSubmitting(false);
       return;
     }
 
-    // 日付を YYYYMMDD に変換 (例: "2023-05-01" -> "20230501")
+    // 日付を YYYYMMDD に変換
     const formattedDate = formData.date?.replace(/-/g, "") || "";
 
-    // AchievementData の形に整形
+    // AchievementData 作成
     const achievementData: AchievementData = {
       ...(formData as AchievementData),
       duration,
@@ -94,8 +94,23 @@ const AchievementForm: React.FC = () => {
       student_name: selectedStudent.displayName,
     };
 
+    // [A] Firestore 更新前に確認ダイアログを表示
+    const confirmMsg = `
+以下の内容でFirestoreを更新します。よろしいですか？
+----------------------------
+生徒名   : ${achievementData.student_name}
+日付     : ${achievementData.date}
+学習時間 : ${achievementData.duration} 分
+----------------------------
+OKを押すと更新を実行します。
+`;
+    if (!window.confirm(confirmMsg.trim())) {
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
-      // 🔥 API にデータを送信
+      // [B] 実際に API へ送信
       const response = await fetch("/api/achievements/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -109,13 +124,12 @@ const AchievementForm: React.FC = () => {
         throw new Error("サーバーエラー");
       }
 
-      // 🔥 成功時
       console.log("送信成功:", await response.json());
 
       // フォームをリセット
       setSelectedStudent(null);
       setSearchTerm("");
-      setFormData({ duration: 0 });
+      setFormData({ duration: 15 }); // 再度15にリセット
     } catch (error) {
       console.error("送信エラー:", error);
       setErrorMessage("データ保存中にエラーが発生しました。");
@@ -123,6 +137,12 @@ const AchievementForm: React.FC = () => {
       setIsSubmitting(false);
     }
   };
+
+  // 🔥 15分刻みのオプションを生成 (例: 15分 ~ 240分)
+  const durationOptions = [];
+  for (let i = 15; i <= 240; i += 15) {
+    durationOptions.push(i);
+  }
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -132,7 +152,7 @@ const AchievementForm: React.FC = () => {
 
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* [A] 生徒検索部分 */}
+          {/* 生徒検索 */}
           <div className="space-y-4">
             {!selectedStudent ? (
               <StudentSearch
@@ -152,7 +172,7 @@ const AchievementForm: React.FC = () => {
             )}
           </div>
 
-          {/* [B] 日付選択 */}
+          {/* 日付選択 */}
           <DatePicker
             id="date"
             name="date"
@@ -160,27 +180,30 @@ const AchievementForm: React.FC = () => {
             onChange={(value) => setFormData((prev) => ({ ...prev, date: value }))}
           />
 
-          {/* [C] 学習時間 (duration) を直接入力 */}
+          {/* 15分刻みの学習時間 (duration) */}
           <div className="space-y-2">
-            <Label htmlFor="duration">学習時間 (分)</Label>
-            <input
+            <Label htmlFor="duration">学習時間 (分) [15分刻み]</Label>
+            <select
               id="duration"
               name="duration"
-              type="number"
-              min="1"
-              value={formData.duration || ""}
+              value={formData.duration || 15}
               onChange={handleChange}
               className="w-full border p-2 rounded"
-              placeholder="学習時間を入力 (例: 60)"
-            />
+            >
+              {durationOptions.map((min) => (
+                <option key={min} value={min}>
+                  {min} 分
+                </option>
+              ))}
+            </select>
           </div>
 
-          {/* [D] 送信ボタン */}
+          {/* 送信ボタン */}
           <Button type="submit" className="w-full" disabled={isSubmitting}>
             {isSubmitting ? "送信中..." : "更新"}
           </Button>
 
-          {/* [E] エラーメッセージ表示 */}
+          {/* エラーメッセージ表示 */}
           {errorMessage && <p className="text-red-500">{errorMessage}</p>}
         </form>
       </CardContent>
