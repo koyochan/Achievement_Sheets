@@ -11,15 +11,5 @@ export interface AchievementData {
   updated_at: Date;
   student_name: string;
   date: string;
-  teacher: string;
-  activity: string;
-  goal: string;
-  progress: string;
-  progress_percentage: number;
-  ratings: number[];
-  xp_earned: number;
-  teacher_comment: string;
-  start_time: number;
-  end_time: number;
   duration: number;
 }

@@ -10,8 +10,7 @@
     },
     "firestore": {
       "port": 8080,
-      "host": "0.0.0.0",
-      "import": "./firestore-backup"
+      "host": "0.0.0.0"
     },
     "ui": {
       "enabled": true,

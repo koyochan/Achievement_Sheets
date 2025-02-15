@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { AchievementData, skills} from "@/type";
-import {  getInitialFormData, } from  "@/utils/GetInitAchievementData"
+import { AchievementData } from "@/type";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -8,190 +7,133 @@ import { DatePicker } from "./form/DataPicker";
 import { StudentSearch, Student } from "./form/StudentSearch";
 
 interface AchievementFormProps {
-  onSubmit: (AchievementData: AchievementData, studentID: string) => void; // 必須: フォーム送信時のコールバック
+  /** フォーム送信時のコールバック */
+  onSubmit: (AchievementData: AchievementData, studentID: string) => void;
 }
 
-// タイムスタンプを15分ごとに9時 ~ 19時(営業時間)まで生成
-
-const generateTimeStamp = () => {
-  const timestamp = [];
-  for (let hour = 9; hour < 19; hour++) {
-    for (let minute = 0; minute < 60; minute += 15) {
-      timestamp.push(hour * 60 + minute); // 分単位で時間を管理
-    }
-  }
-  return timestamp;
-};
-
-const timestamp = generateTimeStamp();
-
-// padstartメソッド(桁を揃えるにあたって文字列の先頭に任意の文字を追加する)　例: 5 -> 05
-
-const numberToTimeString = (minutes: number): string => {
-  const hours = Math.floor(minutes / 60).toString().padStart(2, "0");
-  const mins = (minutes % 60).toString().padStart(2, "0");
-  return `${hours}:${mins}`;
-};
-
 const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
+  // [1] 状態管理
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [results, setResults] = useState<Student[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null); // 選択された生徒を保持する状態
-  const [formData, setFormData] = useState<Partial<AchievementData>>(getInitialFormData());
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [formData, setFormData] = useState<Partial<AchievementData>>({ duration: 0 });
 
-useEffect(() => {
-  const fetchSuggestions = async () => {
-    if (!searchTerm.trim()) {
-      setResults([]);
+  // [2] 生徒検索: API からデータを取得
+  useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (!searchTerm.trim()) {
+        setResults([]);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const res = await fetch(`/api/students/search?searchTerm=${encodeURIComponent(searchTerm.trim())}`);
+        if (!res.ok) throw new Error("APIエラー");
+
+        const data = await res.json();
+        setResults(data.students || []);
+      } catch (error) {
+        console.error("生徒検索APIでエラー:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const timeoutId = setTimeout(fetchSuggestions, 300); // デバウンス: 300ms
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
+  // [3] フォーム入力変更時の処理
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // [4] 検索結果から生徒を選択
+  const handleStudentSelect = (student: Student) => {
+    setSelectedStudent(student);
+    setFormData((prev) => ({ ...prev, student_name: student.displayName }));
+    setSearchTerm(student.displayName);
+    setResults([]);
+  };
+
+  // [5] フォーム送信時の処理
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+
+    // 生徒が未選択の場合エラー
+    if (!selectedStudent) {
+      alert("生徒を選択してください。");
       return;
     }
 
-    setLoading(true);
-
-    try {
-      const studentsSnapshot = await getDocs(collection(db, "Students"));
-
-      console.log("生徒データ:", studentsSnapshot.docs);
-
-      const matchedResults: Student[] = studentsSnapshot.docs
-        .filter((doc) => doc.id.includes(`furigana=${encodeURIComponent(searchTerm.trim())}`))
-        .map((doc) => {
-          const idParts = new URLSearchParams(doc.id);
-
-          return {
-            userid: doc.id,
-            displayName: decodeURIComponent(idParts.get("displayName") || ""),
-            furigana: decodeURIComponent(idParts.get("furigana") || ""),
-          };
-        });
-
-      console.log("検索結果:", matchedResults);
-
-      setResults(matchedResults);
-    } catch (error) {
-      console.error("Firestore検索中にエラーが発生しました:", error);
-    } finally {
-      setLoading(false);
+    // `duration` のバリデーション
+    const duration = Number(formData.duration);
+    if (!duration || duration <= 0) {
+      alert("有効な学習時間 (分) を入力してください。");
+      return;
     }
+
+    // 日付を YYYYMMDD に変換 (例: "2023-05-01" -> "20230501")
+    const formattedDate = formData.date?.replace(/-/g, "") || "";
+
+    // AchievementData の形に整形
+    const achievementData: AchievementData = {
+      ...(formData as AchievementData),
+      duration,
+      date: formattedDate,
+      student_name: selectedStudent.displayName,
+    };
+
+    // 親コンポーネントに送信
+    onSubmit(achievementData, selectedStudent.userid);
   };
-
-  const timeoutId = setTimeout(fetchSuggestions, 300);
-  return () => clearTimeout(timeoutId);
-}, [searchTerm]);
-
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = event.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleStudentSelect = (student: Student) => {
-    setSelectedStudent(student); // 選択された生徒を保存
-    setFormData({
-      ...formData,
-      student_name: student.displayName,
-    });
- 
-    setSearchTerm(student.displayName); // 検索欄をクリア
-    setResults([]); // 検索結果をクリア
-  };
-
-  const handleSubmit = (event: React.FormEvent) => {
-  event.preventDefault();
-
-  // 生徒が選択されていない場合のエラーチェック
-  if (!selectedStudent) {
-    alert("生徒を選択してください。");
-    return;
-  }
-
-  if (!formData.start_time || !formData.end_time || formData.start_time >= formData.end_time) {
-    alert("終了時間は開始時間より後である必要があります。");
-    return;
-  }
-
-  // 所要時間を計算
-  const duration = formData.end_time - formData.start_time;
-
-  // 日付をフォーマット
-  const formattedDate = formData.date?.replace(/-/g, "") || "";
-
-  // AchievementDataを作成
-  const achievementData: AchievementData = {
-    ...(formData as AchievementData),
-    duration: duration,
-    date: formattedDate,
-    student_name: selectedStudent.displayName, // 選択された生徒名
-  };
-
-  // onSubmitにデータと生徒IDを渡す
-  onSubmit(achievementData, selectedStudent.userid);
-};
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle>学習記録フォーム</CardTitle>
       </CardHeader>
+
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* [A] 生徒検索部分 */}
           <div className="space-y-4">
-            {/* 生徒検索 */}
-
             <StudentSearch
-            searchTerm={searchTerm}
-            results={results}
-            loading={loading}
-            onSearchChange={setSearchTerm}
-            onSelectStudent={handleStudentSelect}
+              searchTerm={searchTerm}
+              results={results}
+              loading={loading}
+              onSearchChange={setSearchTerm}
+              onSelectStudent={handleStudentSelect}
             />
-
-            </div>
-            <DatePicker
-              id="date"
-              name="date"
-              value={formData.date || ""}
-              onChange={(value) => setFormData({ ...formData, date: value })}
-            />
-              <Label htmlFor="start_time">開始時間</Label>
-              <select
-                id="start_time"
-                name="start_time"
-                value={formData.start_time}
-                onChange={(e) =>
-                  setFormData({ ...formData, start_time: Number(e.target.value) })
-                }
-                className="w-full border p-2 rounded"
-              >
-                {timestamp.map((minutes) => (
-                  <option key={minutes} value={minutes}>
-                    {numberToTimeString(minutes)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="end_time">終了時間</Label>
-              <select
-                id="end_time"
-                name="end_time"
-                value={formData.end_time}
-                onChange={(e) =>
-                  setFormData({ ...formData, end_time: Number(e.target.value) })
-                }
-                className="w-full border p-2 rounded"
-              >
-                {timestamp
-                  .filter((minutes) => minutes > (formData.start_time || 0))
-                  .map((minutes) => (
-                    <option key={minutes} value={minutes}>
-                      {numberToTimeString(minutes)}
-                    </option>
-                  ))}
-              </select>
-            </div>
           </div>
+
+          {/* [B] 日付選択 */}
+          <DatePicker
+            id="date"
+            name="date"
+            value={formData.date || ""}
+            onChange={(value) => setFormData((prev) => ({ ...prev, date: value }))}
+          />
+
+          {/* [C] 学習時間 (duration) を直接入力 */}
+          <div className="space-y-2">
+            <Label htmlFor="duration">学習時間 (分)</Label>
+            <input
+              id="duration"
+              name="duration"
+              type="number"
+              min="1"
+              value={formData.duration || ""}
+              onChange={handleChange}
+              className="w-full border p-2 rounded"
+              placeholder="学習時間を入力 (例: 60)"
+            />
+          </div>
+
+          {/* [D] 送信ボタン */}
           <Button type="submit" className="w-full">
             更新
           </Button>
