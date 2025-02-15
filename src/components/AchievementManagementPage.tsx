@@ -6,27 +6,24 @@ import { Button } from "@/components/ui/button";
 import { DatePicker } from "./form/DataPicker";
 import { StudentSearch, Student } from "./form/StudentSearch";
 
-interface AchievementFormProps {
-  /** フォーム送信時のコールバック */
-  onSubmit: (AchievementData: AchievementData, studentID: string) => void;
-}
-
-const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
+const AchievementForm: React.FC = () => {
   // [1] 状態管理
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [results, setResults] = useState<Student[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [formData, setFormData] = useState<Partial<AchievementData>>({ duration: 0 });
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // [2] 生徒検索: API からデータを取得
   useEffect(() => {
-    const fetchSuggestions = async () => {
-      if (!searchTerm.trim()) {
-        setResults([]);
-        return;
-      }
+    if (!searchTerm.trim() || selectedStudent) {
+      setResults([]);
+      return;
+    }
 
+    const fetchSuggestions = async () => {
       setLoading(true);
       try {
         const res = await fetch(`/api/students/search?searchTerm=${encodeURIComponent(searchTerm.trim())}`);
@@ -43,7 +40,7 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
 
     const timeoutId = setTimeout(fetchSuggestions, 300); // デバウンス: 300ms
     return () => clearTimeout(timeoutId);
-  }, [searchTerm]);
+  }, [searchTerm, selectedStudent]);
 
   // [3] フォーム入力変更時の処理
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -55,24 +52,34 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
   const handleStudentSelect = (student: Student) => {
     setSelectedStudent(student);
     setFormData((prev) => ({ ...prev, student_name: student.displayName }));
-    setSearchTerm(student.displayName);
-    setResults([]);
+    setSearchTerm(student.displayName); // 検索欄を生徒名にする
   };
 
-  // [5] フォーム送信時の処理
-  const handleSubmit = (event: React.FormEvent) => {
+  // [5] 選択を解除する
+  const handleClearStudent = () => {
+    setSelectedStudent(null);
+    setFormData((prev) => ({ ...prev, student_name: "" }));
+    setSearchTerm("");
+  };
+
+  // [6] フォーム送信時の処理
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setIsSubmitting(true);
+    setErrorMessage(null);
 
     // 生徒が未選択の場合エラー
     if (!selectedStudent) {
-      alert("生徒を選択してください。");
+      setErrorMessage("生徒を選択してください。");
+      setIsSubmitting(false);
       return;
     }
 
     // `duration` のバリデーション
     const duration = Number(formData.duration);
     if (!duration || duration <= 0) {
-      alert("有効な学習時間 (分) を入力してください。");
+      setErrorMessage("有効な学習時間 (分) を入力してください。");
+      setIsSubmitting(false);
       return;
     }
 
@@ -87,8 +94,34 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
       student_name: selectedStudent.displayName,
     };
 
-    // 親コンポーネントに送信
-    onSubmit(achievementData, selectedStudent.userid);
+    try {
+      // 🔥 API にデータを送信
+      const response = await fetch("/api/achievements/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          studentid: selectedStudent.userid,
+          AchievementData: achievementData,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("サーバーエラー");
+      }
+
+      // 🔥 成功時
+      console.log("送信成功:", await response.json());
+
+      // フォームをリセット
+      setSelectedStudent(null);
+      setSearchTerm("");
+      setFormData({ duration: 0 });
+    } catch (error) {
+      console.error("送信エラー:", error);
+      setErrorMessage("データ保存中にエラーが発生しました。");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -101,13 +134,22 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* [A] 生徒検索部分 */}
           <div className="space-y-4">
-            <StudentSearch
-              searchTerm={searchTerm}
-              results={results}
-              loading={loading}
-              onSearchChange={setSearchTerm}
-              onSelectStudent={handleStudentSelect}
-            />
+            {!selectedStudent ? (
+              <StudentSearch
+                searchTerm={searchTerm}
+                results={results}
+                loading={loading}
+                onSearchChange={setSearchTerm}
+                onSelectStudent={handleStudentSelect}
+              />
+            ) : (
+              <div className="flex items-center gap-2 p-2 border rounded">
+                <p className="text-gray-700">選択中: {selectedStudent.displayName}</p>
+                <button type="button" onClick={handleClearStudent} className="text-red-500">
+                  ✕
+                </button>
+              </div>
+            )}
           </div>
 
           {/* [B] 日付選択 */}
@@ -134,9 +176,12 @@ const AchievementForm: React.FC<AchievementFormProps> = ({ onSubmit }) => {
           </div>
 
           {/* [D] 送信ボタン */}
-          <Button type="submit" className="w-full">
-            更新
+          <Button type="submit" className="w-full" disabled={isSubmitting}>
+            {isSubmitting ? "送信中..." : "更新"}
           </Button>
+
+          {/* [E] エラーメッセージ表示 */}
+          {errorMessage && <p className="text-red-500">{errorMessage}</p>}
         </form>
       </CardContent>
     </Card>

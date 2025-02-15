@@ -1,10 +1,26 @@
+# env
+
+.prod.env
+.test.env
+
+# volume
+
+firestore-backup/
+
 # build output
 dist/
 
 .vscode/
 
+# log
+
+firestore-debug.log
+firestore.rules
+database-debug.log
+
 # firebase
 
+10Xer-service-account-file.json
 src/utils/firebase.ts
 
 # generated types

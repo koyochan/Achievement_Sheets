@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  firebase:
+    build: .
+    ports:
+      - "4000:4000"
+      - "8080:8080"
+      - "9099:9099"
+      - "9000:9000"
+      - "8085:8085"
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/app/10Xer-service-account-file.json
+      - PROJECT_ID=tenxer-education
+    volumes:
+      - ./10Xer-service-account-file.json:/app/10Xer-service-account-file.json:ro 
+      - ./firestore-backup:/firestore-backup
+    command: >
+      npx firebase emulators:start --only firestore,auth --import=/firestore-backup
