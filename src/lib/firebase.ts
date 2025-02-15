@@ -11,6 +11,11 @@ if (!admin.apps.length) {
   if (isProduction) {
     const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
 
+    if (!serviceAccountPath) {
+      console.error(`Environment variable GOOGLE_APPLICATION_CREDENTIALS is not set.`);
+      process.exit(1);
+    }
+
     if (!existsSync(serviceAccountPath)) {
       console.error(`Service account key not found at: ${serviceAccountPath}`);
       process.exit(1);
@@ -22,9 +27,13 @@ if (!admin.apps.length) {
         credential: admin.credential.cert(serviceAccount),
         projectId: process.env.PROJECT_ID,
       });
-    } catch (error) {
-      console.error("Failed to load service account key:", error.message);
-      process.exit(1);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Failed to load service account key:", error.message);
+        } else {
+          console.error("Failed to load service account key. Unknown error:", error);
+        }
+        process.exit(1);
     }
   } else {
     process.env.FIRESTORE_EMULATOR_HOST = process.env.FIRESTORE_EMULATOR_HOST || "localhost:8080";
