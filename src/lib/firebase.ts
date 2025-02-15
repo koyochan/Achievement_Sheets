@@ -1,45 +1,36 @@
 import admin from "firebase-admin";
-import { existsSync } from "fs";
+import { existsSync, readFileSync } from "fs";
+import dotenv from "dotenv";
 
-// 🔥 環境変数で Firestore Emulator と本番 Firestore を切り替え
-const isProduction =  "true";
+dotenv.config();
 
-// 📌 本番環境のみ `.env` をロード
-if (isProduction) {
-  import("dotenv").then((dotenv) => {
-    dotenv.config();
-  });
-}
+const isProduction = false;
+console.log(`Running in ${isProduction ? "Production" : "Test"} Mode`);
 
-// Firebase Admin SDK の初期化
 if (!admin.apps.length) {
   if (isProduction) {
-    // 📌 本番環境では認証情報が必要
     const serviceAccountPath = process.env.GOOGLE_APPLICATION_CREDENTIALS;
 
-    if (!serviceAccountPath || !existsSync(serviceAccountPath)) {
-      console.error("❌ Service account key is missing or invalid.");
+    if (!existsSync(serviceAccountPath)) {
+      console.error(`Service account key not found at: ${serviceAccountPath}`);
       process.exit(1);
     }
 
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccountPath),
-      projectId: process.env.PROJECT_ID,
-    });
-
-    console.log("🚀 Connected to Production Firestore");
+    try {
+      const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, "utf-8"));
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount),
+        projectId: process.env.PROJECT_ID,
+      });
+    } catch (error) {
+      console.error("Failed to load service account key:", error.message);
+      process.exit(1);
+    }
   } else {
-    // 📌 Firestore Emulator の場合、認証不要
-    process.env.FIRESTORE_EMULATOR_HOST = "localhost:8080";
-
-    admin.initializeApp({
-      projectId: "tenxer-education", // 直接プロジェクト ID を指定
-    });
-
-    console.log("🔥 Connected to Firestore Emulator");
+    process.env.FIRESTORE_EMULATOR_HOST = process.env.FIRESTORE_EMULATOR_HOST || "localhost:8080";
+    admin.initializeApp({ projectId: process.env.PROJECT_ID || "tenxer-education" });
   }
 }
 
 const db = admin.firestore();
-
 export { db, isProduction };

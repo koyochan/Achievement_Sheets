@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
 import { AchievementData, skills} from "@/type";
 import {  getInitialFormData, } from  "@/utils/GetInitAchievementData"
-import { db } from "@/utils/firebase"; 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -156,78 +154,6 @@ useEffect(() => {
               value={formData.date || ""}
               onChange={(value) => setFormData({ ...formData, date: value })}
             />
-            <div className="space-y-2">
-            {/* <div className="space-y-2">
-              <Label htmlFor="teacher">担当教師</Label>
-              <Input
-                id="teacher"
-                name="teacher"
-                value={formData.teacher || ""}
-                onChange={handleChange}
-              />
-              <Label htmlFor="activity">活動内容</Label>
-              <Input
-                id="activity"
-                name="activity"
-                value={formData.activity || ""}
-                onChange={handleChange}
-                required
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="goal">目標</Label>
-              <Input
-                id="goal"
-                name="goal"
-                value={formData.goal || ""}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="progress">進捗状況</Label>
-              <Input
-                id="progress"
-                name="progress"
-                value={formData.progress || ""}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="progress_percentage">進捗率</Label>
-              <ProgressInput
-                id="progress_percentage"
-                name="progress_percentage"
-                value={formData.progress_percentage || 0}
-                onChange={(value) => setFormData({ ...formData, progress_percentage: value })}
-              />
-            </div>
-            <div className="space-y-4">
-              <Label>評価セクション</Label>
-              {(formData.ratings || []).map((rating, index) => (
-                <div key={index} className="flex items-center justify-between">
-                  <span>{skills[index]}</span>
-                  <StarRating
-                    value={rating}
-                    onChange={(value) => {
-                      const updatedRatings = [...(formData.ratings || [])];
-                      updatedRatings[index] = value;
-                      setFormData({ ...formData, ratings: updatedRatings });
-                    }}
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="teacher_comment">コメント</Label>
-              <Textarea
-                id="teacher_comment"
-                name="teacher_comment"
-                value={formData.teacher_comment || ""}
-                onChange={handleChange}
-                required
-              />
-            </div> */}
-            <div className="space-y-2">
               <Label htmlFor="start_time">開始時間</Label>
               <select
                 id="start_time"
