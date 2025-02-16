@@ -3,8 +3,6 @@ import type { APIRoute } from "astro";
 
 export const GET: APIRoute = async ({ url }) => {
   let searchTerm = url.searchParams.get("searchTerm") || "";
-  // `decodeURIComponent()` でデコード
-  searchTerm = decodeURIComponent(searchTerm);
 
   if (!searchTerm.trim()) {
     return new Response(JSON.stringify({ students: [] }), { status: 200 });
@@ -16,13 +14,13 @@ export const GET: APIRoute = async ({ url }) => {
 
     // 🔥 `doc.id` を `.filter()` で検索
     const matchedResults = snapshot.docs
-      .filter((doc) => doc.id.includes(`furigana=${encodeURIComponent(searchTerm)}`)) // `furigana=` で前方一致
+      .filter((doc) => doc.id.includes(`furigana=${searchTerm}`)) // `furigana=` で前方一致
       .map((doc) => {
         const idParts = new URLSearchParams(doc.id); // `doc.id` をパース
         return {
           userid: doc.id,
-          displayName: decodeURIComponent(idParts.get("displayName") ?? ""),
-          furigana: decodeURIComponent(idParts.get("furigana") ?? ""),
+          displayName: idParts.get("displayName") ?? "",
+          furigana: idParts.get("furigana") ?? "",
         };
       });
 

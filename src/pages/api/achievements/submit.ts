@@ -5,7 +5,7 @@ import admin from "firebase-admin"; // ✅ FirestoreのFieldValueを使うため
 
 /** カスタムIDを生成する関数 */
 function generateCustomId(name: string, date: string, duration: string): string {
-  return `displayName=${encodeURIComponent(name)}&date=${date}&duration=${duration}`;
+  return `displayName=${name}&date=${date}&duration=${duration}`;
 }
 
 export const POST: APIRoute = async ({ request }) => {
@@ -23,24 +23,22 @@ export const POST: APIRoute = async ({ request }) => {
     const created_at = new Date();
     const updated_at = new Date();
 
-    const FormData = {
-      ...AchievementData,
+    // AchievementData を含めて、作成日時/更新日時を付与したオブジェクトを用意
+    const storeData = {
       created_at,
       updated_at,
     };
-
-    // 🔥 カスタムIDを生成
     const attendanceID = generateCustomId(
-      FormData.student_name,
-      FormData.date,
-      String(FormData.duration)
+      AchievementData.student_name,
+      AchievementData.date,
+      String(AchievementData.duration)
     );
 
-    // 🔥 Firestoreに保存
-    // 1) "Attendances" コレクションにデータを保存
-    await db.collection("Attendances").doc(attendanceID).set(FormData);
+    // 🔥 1) "Attendances" コレクションにデータを保存
+    //    FormData ではなく storeData (プレーンオブジェクト) を使う
+    await db.collection("Attendances").doc(attendanceID).set(storeData);
 
-    // 2) "Students" コレクションの studentid ドキュメントをトランザクションで更新
+    // 🔥 2) "Students" コレクションの studentid ドキュメントをトランザクションで更新
     const studentRef = db.collection("Students").doc(studentid);
     await db.runTransaction(async (transaction) => {
       const studentDoc = await transaction.get(studentRef);
@@ -49,45 +47,58 @@ export const POST: APIRoute = async ({ request }) => {
       }
 
       transaction.update(studentRef, {
-        attendances: admin.firestore.FieldValue.arrayUnion(attendanceID), // 🔥 `arrayUnion()` に変更
+        attendances: admin.firestore.FieldValue.arrayUnion(attendanceID), // 配列に追加
+        updated_at: admin.firestore.FieldValue.serverTimestamp(),
       });
     });
 
     console.log("学生の attendance 配列が更新されました:", attendanceID);
 
     // 🔥 3) "Users" コレクションの `studentid` に該当するユーザーのチケット枚数を更新
-    const userQuerySnapshot = await db.collection("Users").where("children", "array-contains", studentid).get();
+    const userQuerySnapshot = await db
+      .collection("Users")
+      .where("children", "array-contains", studentid)
+      .get();
+
     if (userQuerySnapshot.empty) {
       throw new Error("指定された `studentid` に該当するユーザーが見つかりません");
     }
 
-    // `duration` に基づいて `ticket_count` を減算
-
+    // 🚀 15分単位で0.25チケットずつ消費
     const calculateTicketReduction = (duration: number): number => {
-  return Math.ceil(duration / 15) * 0.25; // 15分単位で0.25ずつ増加 (15分未満も0.25)
+      // 例: 15分未満も0.25、15分刻みで加算
+      return Math.ceil(duration / 15) * 0.25;
     };
 
-    const ticketReduction = calculateTicketReduction(FormData.duration); // 60分=1チケット, 最小単位30分=0.5チケット
+    const ticketReduction = calculateTicketReduction(AchievementData.duration);
 
-    // ユーザーのチケットを更新 (トランザクション)
+    // ユーザーのチケットをトランザクションで減算
     await db.runTransaction(async (transaction) => {
       userQuerySnapshot.forEach((userDoc) => {
         const userRef = db.collection("Users").doc(userDoc.id);
         transaction.update(userRef, {
-          ticket_count: admin.firestore.FieldValue.increment(-ticketReduction), // 🔥 `increment(-value)` で減算
+          standardTickets: admin.firestore.FieldValue.increment(-ticketReduction),
           updated_at: admin.firestore.FieldValue.serverTimestamp(),
         });
       });
     });
 
-    console.log("ユーザーの `ticket_count` を", ticketReduction, "減算しました");
+    console.log("ユーザーの `standardTickets` を", ticketReduction, "減算しました");
 
     // 🔥 成功時は JSON を返す
-    return new Response(JSON.stringify({ ...FormData, ticketReduction }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
-
+    // AchievementData の中身とチケット減算量を返す
+    return new Response(
+      JSON.stringify({
+        ...AchievementData,
+        created_at,
+        updated_at,
+        ticketReduction,
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
     console.error("API エラー:", error);
     return new Response(JSON.stringify({ error: "Internal Server Error" }), {

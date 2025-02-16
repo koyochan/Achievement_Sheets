@@ -26,7 +26,7 @@ const AchievementForm: React.FC = () => {
     const fetchSuggestions = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`/api/students/search?searchTerm=${encodeURIComponent(searchTerm.trim())}`);
+        const res = await fetch(`/api/students/search?searchTerm=${searchTerm.trim()}`);
         if (!res.ok) throw new Error("APIエラー");
 
         const data = await res.json();

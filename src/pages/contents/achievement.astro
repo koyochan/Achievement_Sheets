@@ -1,0 +1,21 @@
+---
+import type { AstroGlobal } from "astro";
+import AchievementForm from "@/components/AchievementsForm";
+import Layout from "@/layouts/Layout.astro";
+
+// セッションチェック関数
+async function isUserLoggedIn(Astro: AstroGlobal) {
+  const sessionCookie = Astro.cookies.get("sessionId");
+  return !!sessionCookie;
+}
+
+const loggedIn = await isUserLoggedIn(Astro);
+
+if (!loggedIn) {
+  throw Astro.redirect("/login");
+}
+---
+
+<Layout title="Achievement Management" description="Manage student achievements">
+  <AchievementForm client:load />
+</Layout>
