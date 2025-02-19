@@ -36,7 +36,9 @@
     "shadcn-ui": "^0.9.4",
     "tailwind-merge": "^2.5.5",
     "tailwindcss": "^3.4.16",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.2"
   },
   "devDependencies": {
     "astro": "^5.0.5"

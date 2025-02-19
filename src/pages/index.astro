@@ -1,9 +1,8 @@
 ---
-import AchievementForm from "@/components/AchievementForm";
-import AchievementManagementPage from "@/components/AchievementManagementPage";
+import AchievementForm from "@/components/AchievementsForm";
 import Layout from "@/layouts/Layout.astro";
 ---
 
 <Layout title="Achievement Management" description="Manage student achievements">
-  <AchievementManagementPage client:load />
+  <AchievementForm client:load />
 </Layout>
